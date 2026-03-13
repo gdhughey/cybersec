@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberLab Equipment Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --panel: #0f1628;
+    --panel2: #141d35;
+    --border: #1e2d52;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --green: #00ff9d;
+    --red: #ff4757;
+    --yellow: #ffd32a;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --glow: 0 0 20px rgba(0,212,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(124,58,237,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 0%, rgba(0,212,255,0.06) 0%, transparent 50%);
+  }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(15,22,40,0.97);
+    backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 0.95rem;
+    color: var(--accent); letter-spacing: 0.05em;
+  }
+
+  .header-badges { display: flex; gap: 8px; align-items: center; }
+
+  .hbadge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; padding: 3px 8px;
+    border-radius: 4px; border: 1px solid;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .hbadge-sheets { border-color: #34a853; color: #34a853; }
+  .hbadge-claude { border-color: var(--accent2); color: var(--accent2); }
+
+  .dot { width: 5px; height: 5px; border-radius: 50%; animation: pulse 2s infinite; }
+  .dot-green { background: #34a853; }
+  .dot-blue { background: var(--accent2); }
+
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+  .main { max-width: 860px; margin: 0 auto; padding: 20px 14px; }
+
+  /* Setup Panel */
+  .setup-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+
+  .setup-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .setup-field label {
+    display: block; font-size: 0.7rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+
+  .setup-input {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 7px;
+    padding: 9px 12px; color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    outline: none; transition: border-color 0.2s;
+  }
+
+  .setup-input:focus { border-color: var(--accent); }
+
+  .setup-note {
+    font-size: 0.7rem; color: var(--muted);
+    margin-top: 10px; line-height: 1.5;
+  }
+
+  .setup-note a { color: var(--accent); }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 3px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 4px;
+    margin-bottom: 18px;
+  }
+
+  .tab {
+    flex: 1; padding: 9px 6px;
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    border-radius: 7px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+
+  .tab.active {
+    background: var(--panel2);
+    color: var(--accent);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+
+  /* Card */
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px;
+    margin-bottom: 14px; box-shadow: var(--glow);
+  }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+
+  /* Users */
+  .users-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .user-chip {
+    padding: 7px 15px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--muted); cursor: pointer;
+    font-size: 0.82rem; font-weight: 600;
+    transition: all 0.18s;
+  }
+
+  .user-chip.selected {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  /* Upload */
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 32px 20px; text-align: center;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(0,212,255,0.04); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 2.2rem; margin-bottom: 8px; }
+  .upload-text { color: var(--muted); font-size: 0.83rem; }
+  .upload-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; opacity: 0.55; }
+
+  .preview-img {
+    max-width: 100%; max-height: 200px;
+    border-radius: 8px; border: 1px solid var(--border);
+    display: block; margin: 10px auto;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 9px 18px; border-radius: 8px;
+    border: none; cursor: pointer;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600; font-size: 0.83rem;
+    transition: all 0.18s;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+
+  .btn-primary { background: var(--accent); color: #0a0e1a; }
+  .btn-primary:hover { background: #00b8d9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-green { background: var(--green); color: #0a0e1a; }
+  .btn-green:hover { filter: brightness(1.1); }
+  .btn-green:disabled { opacity:.35; cursor:not-allowed; }
+
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-sm { padding: 6px 11px; font-size: 0.73rem; }
+
+  /* Form */
+  .form-group { margin-bottom: 13px; }
+
+  .form-label {
+    display: block; font-size: 0.7rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+
+  .form-input {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 7px;
+    padding: 9px 13px; color: var(--text);
+    font-family: 'Sora', sans-serif; font-size: 0.86rem;
+    outline: none; transition: border-color 0.2s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Verify */
+  .verify-box {
+    background: var(--bg); border: 1px solid var(--accent);
+    border-radius: 10px; padding: 16px; margin: 14px 0;
+  }
+
+  .verify-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent);
+    margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+
+  .vf { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; font-size: 0.84rem; }
+  .vk { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; min-width: 100px; padding-top: 3px; text-transform: uppercase; }
+
+  .vinput {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px;
+    color: var(--text); font-size: 0.84rem;
+    width: 100%; outline: none; font-family: 'Sora', sans-serif;
+  }
+
+  .vinput:focus { border-color: var(--accent); }
+
+  .conf-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 5px; overflow: hidden; }
+  .conf-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.5s; }
+  .conf-label { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+  /* Log */
+  .log-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+
+  .log-table th {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); padding: 7px 10px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .log-table td { padding: 9px 10px; border-bottom: 1px solid rgba(30,45,82,0.45); vertical-align: top; }
+  .log-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block; padding: 2px 7px;
+    border-radius: 4px; font-size: 0.65rem;
+    font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  .badge-out { background: rgba(255,71,87,0.14); color: var(--red); border: 1px solid rgba(255,71,87,0.28); }
+  .badge-in { background: rgba(0,255,157,0.11); color: var(--green); border: 1px solid rgba(0,255,157,0.22); }
+
+  /* Checkin item */
+  .ci-item {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 13px 15px;
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 10px; margin-bottom: 9px;
+  }
+
+  .ci-name { font-weight: 600; font-size: 0.88rem; }
+  .ci-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Spinner */
+  .spinner-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px; padding: 24px;
+    color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.77rem;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty */
+  .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 0.83rem; }
+  .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.35; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 18px;
+    font-size: 0.83rem; box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    z-index: 999; display: flex; align-items: center; gap: 9px;
+    animation: slideUp 0.28s ease;
+  }
+
+  @keyframes slideUp { from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1} }
+
+  .entry-tabs { display: flex; gap: 3px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 14px; }
+  .etab { flex:1; padding:8px; background:none; border:none; color:var(--muted); cursor:pointer; border-radius:6px; font-family:'Sora',sans-serif; font-size:0.78rem; font-weight:600; transition:all 0.18s; }
+  .etab.active { background:var(--panel2); color:var(--accent); }
+
+  .section-note { font-size: 0.73rem; color: var(--muted); margin-bottom: 12px; font-style: italic; }
+
+  @media(max-width:580px){
+    .form-row,.setup-grid{ grid-template-columns:1fr; }
+    .tabs{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔬 CYBERLAB TRACKER</div>
+  <div class="header-badges">
+    <div class="hbadge hbadge-sheets"><div class="dot dot-green"></div>SHEETS</div>
+    <div class="hbadge hbadge-claude"><div class="dot dot-blue"></div>CLAUDE AI</div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Setup -->
+  <div class="setup-panel">
+    <div class="setup-title">⚙️ Configuration</div>
+    <div class="setup-grid">
+      <div class="setup-field">
+        <label>Claude API Key</label>
+        <input type="password" class="setup-input" id="apiKey" placeholder="sk-ant-api03-..." oninput="cfg.apiKey=this.value" />
+      </div>
+      <div class="setup-field">
+        <label>Apps Script Web App URL</label>
+        <input type="text" class="setup-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/..." oninput="cfg.scriptUrl=this.value" />
+      </div>
+    </div>
+    <div class="setup-note">
+      📋 <strong style="color:var(--text)">Setup:</strong>
+      Open your Google Sheet → <em>Extensions → Apps Script</em> → paste <code>Code.gs</code> → Deploy as Web App (Anyone can access) → copy the URL above.
+      <br>Full instructions in the <code>SETUP.md</code> file included.
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('checkout')" id="tab-checkout">📤 Check Out</button>
+    <button class="tab" onclick="switchTab('checkin')" id="tab-checkin">📥 Check In</button>
+    <button class="tab" onclick="switchTab('log')" id="tab-log">📋 Log</button>
+  </div>
+
+  <!-- ── CHECKOUT ─────────────────────────────────────────────── -->
+  <div id="page-checkout">
+
+    <!-- Who -->
+    <div class="card">
+      <div class="card-title">👤 Who's Checking Out?</div>
+      <div class="users-row" id="userChips">
+        <div class="user-chip" onclick="selectUser(this,'Garrett')">Garrett</div>
+        <div class="user-chip" onclick="selectUser(this,'Friend')">Friend</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" class="form-input" id="newUserInput" placeholder="Add another name..." style="max-width:200px;" onkeydown="if(event.key==='Enter')addUser()" />
+        <button class="btn btn-outline btn-sm" onclick="addUser()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Entry -->
+    <div class="card">
+      <div class="card-title">📦 Equipment Entry</div>
+      <div class="entry-tabs">
+        <button class="etab active" onclick="switchEntry('scan')" id="etab-scan">📷 AI Photo Scan</button>
+        <button class="etab" onclick="switchEntry('manual')" id="etab-manual">✏️ Manual Entry</button>
+      </div>
+
+      <!-- SCAN -->
+      <div id="scanMode">
+        <div class="section-note">Snap or upload a photo — Claude AI reads the name, serial number & barcode.</div>
+        <div class="upload-zone" id="dropZone"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <input type="file" accept="image/*" capture="environment" onchange="handleFile(event)" />
+          <div class="upload-icon">📸</div>
+          <div class="upload-text">Tap to take/upload photo</div>
+          <div class="upload-sub">JPG, PNG — drag & drop works too</div>
+        </div>
+
+        <div id="imgPreview" style="display:none;">
+          <img id="previewImg" class="preview-img" />
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <button class="btn btn-primary" id="scanBtn" onclick="scanImage()">🤖 Scan with Claude</button>
+            <button class="btn btn-outline btn-sm" onclick="clearImg()">✕ Clear</button>
+          </div>
+        </div>
+
+        <div id="scanStatus" style="display:none;">
+          <div class="spinner-wrap">
+            <div class="spinner"></div>
+            <span id="scanText">Analyzing with Claude AI...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANUAL -->
+      <div id="manualMode" style="display:none;">
+        <div class="section-note">For small items without barcodes — enter info directly.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Equipment Name *</label>
+            <input type="text" class="form-input" id="m_name" placeholder="e.g. Ethernet Cable Cat6" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type / Category</label>
+            <input type="text" class="form-input" id="m_type" placeholder="e.g. Cable, Adapter" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Serial Number</label>
+            <input type="text" class="form-input" id="m_serial" placeholder="If available" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Barcode / Asset Tag</label>
+            <input type="text" class="form-input" id="m_barcode" placeholder="If available" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" class="form-input" id="m_notes" placeholder="Condition, color, quantity..." />
+        </div>
+        <button class="btn btn-primary" onclick="prepManualVerify()">Next → Review & Confirm</button>
+      </div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="card" id="verifyCard" style="display:none;">
+      <div class="card-title">✅ Verify Before Saving to Google Sheets</div>
+      <div class="verify-box">
+        <div class="verify-title">⚠️ Edit any field if AI got it wrong</div>
+
+        <div class="vf"><span class="vk">Equipment</span><div style="flex:1"><input class="vinput" id="v_name" type="text" /></div></div>
+        <div class="vf"><span class="vk">Type</span><div style="flex:1"><input class="vinput" id="v_type" type="text" /></div></div>
+        <div class="vf"><span class="vk">Serial #</span><div style="flex:1"><input class="vinput" id="v_serial" type="text" /></div></div>
+        <div class="vf"><span class="vk">Barcode</span><div style="flex:1"><input class="vinput" id="v_barcode" type="text" /></div></div>
+        <div class="vf"><span class="vk">Notes</span><div style="flex:1"><input class="vinput" id="v_notes" type="text" /></div></div>
+
+        <div id="confSection" style="display:none;margin-top:8px;">
+          <div class="conf-label">AI Confidence</div>
+          <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+          <div class="conf-label" id="confText"></div>
+        </div>
+      </div>
+
+      <div class="vf" style="margin-top:12px;">
+        <span class="vk" style="min-width:100px;">Checked out by</span>
+        <strong id="v_user" style="color:var(--accent);"></strong>
+      </div>
+      <div class="vf">
+        <span class="vk" style="min-width:100px;">Date / Time</span>
+        <span id="v_datetime" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);"></span>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-green" id="confirmBtn" onclick="confirmCheckout()">✔ Confirm → Save to Sheets</button>
+        <button class="btn btn-outline" onclick="cancelVerify()">✕ Cancel</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── CHECK IN ─────────────────────────────────────────────── -->
+  <div id="page-checkin" style="display:none;">
+    <div class="card">
+      <div class="card-title">📥 Currently Checked Out</div>
+      <div id="checkedOutList"><div class="empty"><div class="empty-icon">📥</div>Load the log to see checked out items.</div></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="loadCheckin()">🔄 Refresh from Sheets</button>
+    </div>
+  </div>
+
+  <!-- ── LOG ──────────────────────────────────────────────────── -->
+  <div id="page-log" style="display:none;">
+    <div class="card">
+      <div class="card-title">📋 Full Activity Log — Live from Google Sheets</div>
+      <div id="logWrap">
+        <div class="empty"><div class="empty-icon">📋</div>Click Refresh to load the log.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-outline btn-sm" onclick="loadLog()">🔄 Refresh</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast" style="display:none;"></div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────
+const cfg = { apiKey: '', scriptUrl: '' };
+
+// ── STATE ──────────────────────────────────────────────────────────
+let selectedUser = '';
+let imgB64 = null;
+let imgMime = 'image/jpeg';
+let pendingFromAI = false;
+let cachedLog = [];
+
+// ── TABS ───────────────────────────────────────────────────────────
+function switchTab(t) {
+  ['checkout','checkin','log'].forEach(x => {
+    document.getElementById('page-'+x).style.display = x===t ? '' : 'none';
+    document.getElementById('tab-'+x).classList.toggle('active', x===t);
+  });
+  if (t==='checkin') loadCheckin();
+  if (t==='log') loadLog();
+}
+
+function switchEntry(m) {
+  document.getElementById('scanMode').style.display = m==='scan' ? '' : 'none';
+  document.getElementById('manualMode').style.display = m==='manual' ? '' : 'none';
+  document.getElementById('etab-scan').classList.toggle('active', m==='scan');
+  document.getElementById('etab-manual').classList.toggle('active', m==='manual');
+  document.getElementById('verifyCard').style.display = 'none';
+}
+
+// ── USERS ──────────────────────────────────────────────────────────
+function selectUser(el, name) {
+  document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUser = name;
+}
+
+function addUser() {
+  const val = document.getElementById('newUserInput').value.trim();
+  if (!val) return;
+  const c = document.createElement('div');
+  c.className = 'user-chip';
+  c.textContent = val;
+  c.onclick = function(){ selectUser(this, val); };
+  document.getElementById('userChips').appendChild(c);
+  document.getElementById('newUserInput').value = '';
+}
+
+// ── IMAGE ──────────────────────────────────────────────────────────
+function handleFile(e) { if(e.target.files[0]) loadImg(e.target.files[0]); }
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadImg(f);
+}
+
+function loadImg(file) {
+  imgMime = file.type || 'image/jpeg';
+  const r = new FileReader();
+  r.onload = ev => {
+    imgB64 = ev.target.result.split(',')[1];
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('imgPreview').style.display = '';
+    document.getElementById('dropZone').style.display = 'none';
+    document.getElementById('verifyCard').style.display = 'none';
+  };
+  r.readAsDataURL(file);
+}
+
+function clearImg() {
+  imgB64 = null;
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('dropZone').style.display = '';
+  document.getElementById('verifyCard').style.display = 'none';
+}
+
+// ── AI SCAN ────────────────────────────────────────────────────────
+async function scanImage() {
+  if (!cfg.apiKey) { toast('⚠️ Enter your Claude API key!', 'yellow'); return; }
+  if (!imgB64)     { toast('⚠️ No image loaded!', 'red'); return; }
+  if (!selectedUser){ toast('⚠️ Select who is checking out!', 'yellow'); return; }
+
+  setScanLoading(true, 'Analyzing image with Claude AI...');
+
+  const prompt = `You are an equipment scanner for a cybersecurity lab. Examine this image carefully.
+
+Extract:
+1. Equipment name/description (e.g. "Cisco Catalyst 2960 Switch", "USB Flash Drive 64GB")
+2. Equipment type/category (e.g. "Network Switch", "Storage", "Cable")
+3. Serial number (look for "S/N:", "Serial:", stickers with alphanumeric codes)
+4. Barcode number (any barcode value, asset tag, or inventory number visible)
+5. Any other notable info (model number, color, condition)
+6. Confidence level 0-100 in the extracted info
+
+CRITICAL: Never make up serial numbers or barcodes. Use "" if not visible.
+
+Respond ONLY with valid JSON, no markdown:
+{"name":"...","type":"...","serial":"...","barcode":"...","notes":"...","confidence":85}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': cfg.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imgMime, data: imgB64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const raw = data.content.map(b => b.text||'').join('');
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    setScanLoading(false);
+    populateVerify(parsed, true);
+  } catch(err) {
+    setScanLoading(false);
+    toast('❌ Scan failed: ' + err.message, 'red');
+  }
+}
+
+function setScanLoading(on, msg='') {
+  document.getElementById('scanStatus').style.display = on ? '' : 'none';
+  document.getElementById('scanText').textContent = msg;
+  document.getElementById('scanBtn').disabled = on;
+}
+
+// ── MANUAL VERIFY ──────────────────────────────────────────────────
+function prepManualVerify() {
+  if (!selectedUser){ toast('⚠️ Select who is checking out!', 'yellow'); return; }
+  const name = document.getElementById('m_name').value.trim();
+  if (!name){ toast('⚠️ Equipment name required!', 'yellow'); return; }
+  populateVerify({
+    name, type: document.getElementById('m_type').value.trim(),
+    serial: document.getElementById('m_serial').value.trim(),
+    barcode: document.getElementById('m_barcode').value.trim(),
+    notes: document.getElementById('m_notes').value.trim(),
+    confidence: null
+  }, false);
+}
+
+function populateVerify(d, fromAI) {
+  document.getElementById('v_name').value   = d.name    || '';
+  document.getElementById('v_type').value   = d.type    || '';
+  document.getElementById('v_serial').value = d.serial  || '';
+  document.getElementById('v_barcode').value= d.barcode || '';
+  document.getElementById('v_notes').value  = d.notes   || '';
+  document.getElementById('v_user').textContent    = selectedUser;
+  document.getElementById('v_datetime').textContent = new Date().toLocaleString();
+
+  if (fromAI && d.confidence != null) {
+    document.getElementById('confSection').style.display = '';
+    document.getElementById('confFill').style.width = d.confidence + '%';
+    document.getElementById('confText').textContent =
+      `${d.confidence}% — ${d.confidence>=80?'High confidence':d.confidence>=50?'Medium — double-check':'Low — verify carefully'}`;
+  } else {
+    document.getElementById('confSection').style.display = 'none';
+  }
+
+  pendingFromAI = fromAI;
+  document.getElementById('verifyCard').style.display = '';
+  document.getElementById('verifyCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelVerify(){ document.getElementById('verifyCard').style.display='none'; }
+
+// ── CONFIRM → SHEETS ───────────────────────────────────────────────
+async function confirmCheckout() {
+  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL first!', 'yellow'); return; }
+
+  const payload = {
+    action: 'checkout',
+    name:    document.getElementById('v_name').value.trim(),
+    type:    document.getElementById('v_type').value.trim(),
+    serial:  document.getElementById('v_serial').value.trim(),
+    barcode: document.getElementById('v_barcode').value.trim(),
+    notes:   document.getElementById('v_notes').value.trim(),
+    user:    selectedUser,
+    source:  pendingFromAI ? 'AI Scan' : 'Manual'
+  };
+
+  if (!payload.name){ toast('⚠️ Equipment name required!', 'yellow'); return; }
+
+  const btn = document.getElementById('confirmBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saving to Sheets...';
+
+  try {
+    const res = await fetch(cfg.scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Unknown error');
+
+    toast(`✅ "${payload.name}" saved to Google Sheets!`, 'green');
+    document.getElementById('verifyCard').style.display = 'none';
+    clearImg();
+    ['m_name','m_type','m_serial','m_barcode','m_notes'].forEach(id => document.getElementById(id).value='');
+  } catch(err) {
+    toast('❌ Sheets error: ' + err.message, 'red');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✔ Confirm → Save to Sheets';
+}
+
+// ── CHECKIN ────────────────────────────────────────────────────────
+async function loadCheckin() {
+  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
+  const list = document.getElementById('checkedOutList');
+  list.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><span>Loading from Sheets...</span></div>';
+  try {
+    const res = await fetch(cfg.scriptUrl + '?action=getLog');
+    const data = await res.json();
+    cachedLog = data.log || [];
+    renderCheckedOut();
+  } catch(err) {
+    list.innerHTML = `<div class="empty">❌ Error: ${err.message}</div>`;
+  }
+}
+
+function renderCheckedOut() {
+  const list = document.getElementById('checkedOutList');
+  const out = cachedLog.filter(e => e.status === 'OUT');
+  if (!out.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div>All equipment is checked in!</div>';
+    return;
+  }
+  list.innerHTML = out.map(e => `
+    <div class="ci-item">
+      <div>
+        <div class="ci-name">${e.name}</div>
+        <div class="ci-meta">
+          ${e.type ? e.type+' · ':''}
+          ${e.serial ? 'S/N: '+e.serial+' · ':''}
+          ${e.barcode ? 'BC: '+e.barcode+' · ':''}
+          By <strong style="color:var(--accent)">${e.user}</strong>
+          on ${e.checkoutDate} ${e.checkoutTime}
+        </div>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="checkIn('${e.id}','${e.name}')">📥 Check In</button>
+    </div>
+  `).join('');
+}
+
+async function checkIn(id, name) {
+  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
+  try {
+    const res = await fetch(cfg.scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'checkin', id })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    toast(`📥 "${name}" checked in to Sheets!`, 'green');
+    await loadCheckin();
+  } catch(err) {
+    toast('❌ ' + err.message, 'red');
+  }
+}
+
+// ── LOG ────────────────────────────────────────────────────────────
+async function loadLog() {
+  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
+  const wrap = document.getElementById('logWrap');
+  wrap.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><span>Fetching from Google Sheets...</span></div>';
+  try {
+    const res = await fetch(cfg.scriptUrl + '?action=getLog');
+    const data = await res.json();
+    cachedLog = data.log || [];
+    if (!cachedLog.length) {
+      wrap.innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No entries yet.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div style="overflow-x:auto;">
+      <table class="log-table">
+        <thead><tr>
+          <th>Status</th><th>Equipment</th><th>Serial / Barcode</th>
+          <th>User</th><th>Checkout</th><th>Checkin</th><th>Notes</th>
+        </tr></thead>
+        <tbody>
+          ${cachedLog.map(e => `
+            <tr>
+              <td><span class="badge ${e.status==='OUT'?'badge-out':'badge-in'}">${e.status}</span></td>
+              <td><strong>${e.name}</strong>${e.type?'<br><span style="color:var(--muted);font-size:.68rem;">'+e.type+'</span>':''}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.68rem;">
+                ${e.serial?'S/N: '+e.serial+'<br>':''}
+                ${e.barcode?'BC: '+e.barcode:''}
+                ${!e.serial&&!e.barcode?'<span style="color:var(--muted)">—</span>':''}
+              </td>
+              <td style="color:var(--accent);font-weight:600;">${e.user}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);">${e.checkoutDate}<br>${e.checkoutTime}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);">
+                ${e.checkinDate ? e.checkinDate+'<br>'+e.checkinTime : '<span style="color:var(--red)">—</span>'}
+              </td>
+              <td style="font-size:.73rem;color:var(--muted);">${e.notes||'—'}<br><span style="font-size:.62rem;opacity:.5;">${e.source||''}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  } catch(err) {
+    wrap.innerHTML = `<div class="empty">❌ Error: ${err.message}</div>`;
+  }
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'flex';
+  el.style.borderColor = type==='red'?'var(--red)':type==='green'?'var(--green)':type==='yellow'?'var(--yellow)':'var(--border)';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>el.style.display='none', 3500);
+}
+</script>
+</body>
+</html>
