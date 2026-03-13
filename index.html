@@ -2,856 +2,428 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CyberLab Equipment Tracker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CyberLab Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
-
-  :root {
-    --bg: #0a0e1a;
-    --panel: #0f1628;
-    --panel2: #141d35;
-    --border: #1e2d52;
-    --accent: #00d4ff;
-    --accent2: #7c3aed;
-    --green: #00ff9d;
-    --red: #ff4757;
-    --yellow: #ffd32a;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --glow: 0 0 20px rgba(0,212,255,0.12);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Sora', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(124,58,237,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 0%, rgba(0,212,255,0.06) 0%, transparent 50%);
-  }
-
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 24px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(15,22,40,0.97);
-    backdrop-filter: blur(10px);
-    position: sticky; top: 0; z-index: 100;
-  }
-
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700; font-size: 0.95rem;
-    color: var(--accent); letter-spacing: 0.05em;
-  }
-
-  .header-badges { display: flex; gap: 8px; align-items: center; }
-
-  .hbadge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem; padding: 3px 8px;
-    border-radius: 4px; border: 1px solid;
-    display: flex; align-items: center; gap: 5px;
-  }
-
-  .hbadge-sheets { border-color: #34a853; color: #34a853; }
-  .hbadge-claude { border-color: var(--accent2); color: var(--accent2); }
-
-  .dot { width: 5px; height: 5px; border-radius: 50%; animation: pulse 2s infinite; }
-  .dot-green { background: #34a853; }
-  .dot-blue { background: var(--accent2); }
-
-  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
-
-  .main { max-width: 860px; margin: 0 auto; padding: 20px 14px; }
-
-  /* Setup Panel */
-  .setup-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 22px;
-    margin-bottom: 18px;
-  }
-
-  .setup-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--accent);
-    text-transform: uppercase; letter-spacing: 0.12em;
-    margin-bottom: 14px;
-  }
-
-  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  .setup-field label {
-    display: block; font-size: 0.7rem; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 5px;
-  }
-
-  .setup-input {
-    width: 100%; background: var(--bg);
-    border: 1px solid var(--border); border-radius: 7px;
-    padding: 9px 12px; color: var(--text);
-    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
-    outline: none; transition: border-color 0.2s;
-  }
-
-  .setup-input:focus { border-color: var(--accent); }
-
-  .setup-note {
-    font-size: 0.7rem; color: var(--muted);
-    margin-top: 10px; line-height: 1.5;
-  }
-
-  .setup-note a { color: var(--accent); }
-
-  /* Tabs */
-  .tabs {
-    display: flex; gap: 3px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px; padding: 4px;
-    margin-bottom: 18px;
-  }
-
-  .tab {
-    flex: 1; padding: 9px 6px;
-    background: none; border: none;
-    color: var(--muted); cursor: pointer;
-    border-radius: 7px;
-    font-family: 'Sora', sans-serif;
-    font-size: 0.8rem; font-weight: 600;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
-  }
-
-  .tab.active {
-    background: var(--panel2);
-    color: var(--accent);
-    box-shadow: 0 0 0 1px var(--border);
-  }
-
-  /* Card */
-  .card {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 12px; padding: 22px;
-    margin-bottom: 14px; box-shadow: var(--glow);
-  }
-
-  .card-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--accent);
-    text-transform: uppercase; letter-spacing: 0.12em;
-    margin-bottom: 14px;
-  }
-
-  /* Users */
-  .users-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-
-  .user-chip {
-    padding: 7px 15px; border-radius: 20px;
-    border: 1px solid var(--border); background: var(--bg);
-    color: var(--muted); cursor: pointer;
-    font-size: 0.82rem; font-weight: 600;
-    transition: all 0.18s;
-  }
-
-  .user-chip.selected {
-    border-color: var(--accent); color: var(--accent);
-    background: rgba(0,212,255,0.08);
-  }
-
-  /* Upload */
-  .upload-zone {
-    border: 2px dashed var(--border); border-radius: 10px;
-    padding: 32px 20px; text-align: center;
-    cursor: pointer; transition: all 0.2s; position: relative;
-  }
-
-  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(0,212,255,0.04); }
-  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 2.2rem; margin-bottom: 8px; }
-  .upload-text { color: var(--muted); font-size: 0.83rem; }
-  .upload-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; opacity: 0.55; }
-
-  .preview-img {
-    max-width: 100%; max-height: 200px;
-    border-radius: 8px; border: 1px solid var(--border);
-    display: block; margin: 10px auto;
-  }
-
-  /* Buttons */
-  .btn {
-    padding: 9px 18px; border-radius: 8px;
-    border: none; cursor: pointer;
-    font-family: 'Sora', sans-serif;
-    font-weight: 600; font-size: 0.83rem;
-    transition: all 0.18s;
-    display: inline-flex; align-items: center; gap: 7px;
-  }
-
-  .btn-primary { background: var(--accent); color: #0a0e1a; }
-  .btn-primary:hover { background: #00b8d9; transform: translateY(-1px); }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-
-  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-  .btn-green { background: var(--green); color: #0a0e1a; }
-  .btn-green:hover { filter: brightness(1.1); }
-  .btn-green:disabled { opacity:.35; cursor:not-allowed; }
-
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-sm { padding: 6px 11px; font-size: 0.73rem; }
-
-  /* Form */
-  .form-group { margin-bottom: 13px; }
-
-  .form-label {
-    display: block; font-size: 0.7rem; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 5px;
-  }
-
-  .form-input {
-    width: 100%; background: var(--bg);
-    border: 1px solid var(--border); border-radius: 7px;
-    padding: 9px 13px; color: var(--text);
-    font-family: 'Sora', sans-serif; font-size: 0.86rem;
-    outline: none; transition: border-color 0.2s;
-  }
-
-  .form-input:focus { border-color: var(--accent); }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  /* Verify */
-  .verify-box {
-    background: var(--bg); border: 1px solid var(--accent);
-    border-radius: 10px; padding: 16px; margin: 14px 0;
-  }
-
-  .verify-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--accent);
-    margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em;
-  }
-
-  .vf { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; font-size: 0.84rem; }
-  .vk { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; min-width: 100px; padding-top: 3px; text-transform: uppercase; }
-
-  .vinput {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 6px; padding: 6px 10px;
-    color: var(--text); font-size: 0.84rem;
-    width: 100%; outline: none; font-family: 'Sora', sans-serif;
-  }
-
-  .vinput:focus { border-color: var(--accent); }
-
-  .conf-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 5px; overflow: hidden; }
-  .conf-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.5s; }
-  .conf-label { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
-
-  /* Log */
-  .log-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-
-  .log-table th {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--muted); padding: 7px 10px; text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .log-table td { padding: 9px 10px; border-bottom: 1px solid rgba(30,45,82,0.45); vertical-align: top; }
-  .log-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .badge {
-    display: inline-block; padding: 2px 7px;
-    border-radius: 4px; font-size: 0.65rem;
-    font-weight: 700; font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase;
-  }
-
-  .badge-out { background: rgba(255,71,87,0.14); color: var(--red); border: 1px solid rgba(255,71,87,0.28); }
-  .badge-in { background: rgba(0,255,157,0.11); color: var(--green); border: 1px solid rgba(0,255,157,0.22); }
-
-  /* Checkin item */
-  .ci-item {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 13px 15px;
-    display: flex; justify-content: space-between;
-    align-items: center; gap: 10px; margin-bottom: 9px;
-  }
-
-  .ci-name { font-weight: 600; font-size: 0.88rem; }
-  .ci-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
-
-  /* Spinner */
-  .spinner-wrap {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 10px; padding: 24px;
-    color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.77rem;
-  }
-
-  .spinner {
-    width: 36px; height: 36px;
-    border: 2px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 0.7s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Empty */
-  .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 0.83rem; }
-  .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.35; }
-
-  /* Toast */
-  .toast {
-    position: fixed; bottom: 20px; right: 20px;
-    background: var(--panel2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 11px 18px;
-    font-size: 0.83rem; box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-    z-index: 999; display: flex; align-items: center; gap: 9px;
-    animation: slideUp 0.28s ease;
-  }
-
-  @keyframes slideUp { from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1} }
-
-  .entry-tabs { display: flex; gap: 3px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 14px; }
-  .etab { flex:1; padding:8px; background:none; border:none; color:var(--muted); cursor:pointer; border-radius:6px; font-family:'Sora',sans-serif; font-size:0.78rem; font-weight:600; transition:all 0.18s; }
-  .etab.active { background:var(--panel2); color:var(--accent); }
-
-  .section-note { font-size: 0.73rem; color: var(--muted); margin-bottom: 12px; font-style: italic; }
-
-  @media(max-width:580px){
-    .form-row,.setup-grid{ grid-template-columns:1fr; }
-    .tabs{ flex-direction:column; }
-  }
+:root{
+  --bg:#08111f;--panel:#0d1a2e;--panel2:#111f38;
+  --border:#1a2d4a;--accent:#00cfff;--purple:#7c3aed;
+  --green:#00e896;--red:#ff4560;--yellow:#ffc800;
+  --text:#ddeeff;--muted:#4a6080;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:"Sora",sans-serif;background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 0%,rgba(124,58,237,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 90% 5%,rgba(0,207,255,.05) 0%,transparent 60%);
+}
+.navbar{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));
+  background:rgba(13,26,46,.98);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+.logo{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.9rem;color:var(--accent);letter-spacing:.04em;display:flex;align-items:center;gap:8px;}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 13px calc(76px + var(--sb));}
+.btabs{
+  flex-shrink:0;display:flex;
+  background:rgba(13,26,46,.98);border-top:1px solid var(--border);
+  padding-bottom:calc(6px + var(--sb));backdrop-filter:blur(12px);
+}
+.bt{flex:1;padding:9px 4px 5px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:"Sora",sans-serif;font-size:.62rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .18s;}
+.bt .i{font-size:1.25rem;line-height:1;}
+.bt.on{color:var(--accent);}
+.page{display:none;}
+.page.on{display:block;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:17px;margin-bottom:12px;}
+.ctitle{font-family:"JetBrains Mono",monospace;font-size:.63rem;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin-bottom:13px;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .18s;user-select:none;}
+.chip.on{border-color:var(--accent);color:var(--accent);background:rgba(0,207,255,.08);}
+.mtog{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:14px;}
+.mt{flex:1;padding:9px 4px;background:none;border:none;color:var(--muted);cursor:pointer;border-radius:8px;font-family:"Sora",sans-serif;font-size:.78rem;font-weight:600;transition:all .18s;}
+.mt.on{background:var(--panel2);color:var(--accent);}
+.dz{border:2px dashed var(--border);border-radius:12px;padding:34px 14px;text-align:center;cursor:pointer;position:relative;transition:all .2s;}
+.dz:active{border-color:var(--accent);background:rgba(0,207,255,.04);}
+.dz input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.dzi{font-size:2.6rem;margin-bottom:7px;}
+.dzt{color:var(--muted);font-size:.86rem;font-weight:600;}
+.dzs{font-size:.7rem;color:var(--muted);margin-top:3px;opacity:.5;}
+.pimg{max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--border);display:block;margin:11px auto;}
+.fg{margin-bottom:12px;}
+.fl{display:block;font-size:.66rem;color:var(--muted);font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+.fi{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:"Sora",sans-serif;font-size:.9rem;outline:none;transition:border-color .18s;-webkit-appearance:none;}
+.fi:focus{border-color:var(--accent);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{padding:12px 16px;border-radius:10px;border:none;cursor:pointer;font-family:"Sora",sans-serif;font-weight:700;font-size:.87rem;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:all .18s;user-select:none;min-height:46px;}
+.bp{background:var(--accent);color:#08111f;}
+.bp:active{filter:brightness(.85);}
+.bp:disabled{opacity:.35;pointer-events:none;}
+.bo{background:none;border:1px solid var(--border);color:var(--text);}
+.bo:active{border-color:var(--accent);color:var(--accent);}
+.bg{background:var(--green);color:#08111f;}
+.bg:active{filter:brightness(.88);}
+.bg:disabled{opacity:.35;pointer-events:none;}
+.bfull{width:100%;}
+.bsm{padding:8px 12px;font-size:.76rem;min-height:36px;}
+.brow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.vbox{background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:14px;margin:11px 0;}
+.vbt{font-family:"JetBrains Mono",monospace;font-size:.63rem;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:11px;}
+.vr{display:flex;align-items:flex-start;gap:9px;margin-bottom:8px;}
+.vk{color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:.6rem;min-width:78px;padding-top:4px;text-transform:uppercase;}
+.vi{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:.88rem;outline:none;font-family:"Sora",sans-serif;-webkit-appearance:none;width:100%;}
+.vi:focus{border-color:var(--accent);}
+.cbar{height:4px;border-radius:2px;background:var(--border);overflow:hidden;margin-top:4px;}
+.cfill{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));transition:width .5s;}
+.clbl{font-size:.6rem;color:var(--muted);font-family:"JetBrains Mono",monospace;margin-top:3px;}
+.ci{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 13px;display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.cin{flex:1;min-width:0;}
+.cname{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{font-size:.65rem;color:var(--muted);margin-top:3px;font-family:"JetBrains Mono",monospace;line-height:1.5;}
+.sw{display:flex;flex-direction:column;align-items:center;gap:9px;padding:26px;color:var(--accent);font-family:"JetBrains Mono",monospace;font-size:.73rem;}
+.sp{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.es{text-align:center;padding:34px 14px;color:var(--muted);}
+.ei{font-size:2.2rem;margin-bottom:9px;opacity:.3;}
+.et{font-size:.82rem;}
+.note{font-size:.7rem;color:var(--muted);font-style:italic;margin-bottom:12px;line-height:1.5;}
+.ls{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -17px;padding:0 17px;}
+table{width:100%;border-collapse:collapse;font-size:.73rem;min-width:500px;}
+th{font-family:"JetBrains Mono",monospace;font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top;}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.6rem;font-weight:700;font-family:"JetBrains Mono",monospace;text-transform:uppercase;}
+.bout{background:rgba(255,69,96,.13);color:var(--red);border:1px solid rgba(255,69,96,.25);}
+.bin{background:rgba(0,232,150,.1);color:var(--green);border:1px solid rgba(0,232,150,.2);}
+.aur{display:flex;gap:7px;align-items:center;}
+.aur .fi{max-width:170px;}
+#toast{position:fixed;bottom:calc(70px + var(--sb));left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 17px;font-size:.8rem;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,.5);z-index:9999;display:none;animation:pop .25s ease;}
+@keyframes pop{from{transform:translateX(-50%) translateY(8px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🔬 CYBERLAB TRACKER</div>
-  <div class="header-badges">
-    <div class="hbadge hbadge-sheets"><div class="dot dot-green"></div>SHEETS</div>
-    <div class="hbadge hbadge-claude"><div class="dot dot-blue"></div>CLAUDE AI</div>
-  </div>
-</header>
+<div class="navbar">
+  <div class="logo"><div class="ndot"></div>CYBERLAB TRACKER</div>
+  <div style="font-family:JetBrains Mono,monospace;font-size:.62rem;color:var(--muted);">📊 Google Sheets</div>
+</div>
 
-<div class="main">
+<div class="scroll" id="scr">
 
-  <!-- Setup -->
-  <div class="setup-panel">
-    <div class="setup-title">⚙️ Configuration</div>
-    <div class="setup-grid">
-      <div class="setup-field">
-        <label>Claude API Key</label>
-        <input type="password" class="setup-input" id="apiKey" placeholder="sk-ant-api03-..." oninput="cfg.apiKey=this.value" />
-      </div>
-      <div class="setup-field">
-        <label>Apps Script Web App URL</label>
-        <input type="text" class="setup-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/..." oninput="cfg.scriptUrl=this.value" />
-      </div>
-    </div>
-    <div class="setup-note">
-      📋 <strong style="color:var(--text)">Setup:</strong>
-      Open your Google Sheet → <em>Extensions → Apps Script</em> → paste <code>Code.gs</code> → Deploy as Web App (Anyone can access) → copy the URL above.
-      <br>Full instructions in the <code>SETUP.md</code> file included.
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('checkout')" id="tab-checkout">📤 Check Out</button>
-    <button class="tab" onclick="switchTab('checkin')" id="tab-checkin">📥 Check In</button>
-    <button class="tab" onclick="switchTab('log')" id="tab-log">📋 Log</button>
-  </div>
-
-  <!-- ── CHECKOUT ─────────────────────────────────────────────── -->
-  <div id="page-checkout">
-
-    <!-- Who -->
+  <!-- CHECKOUT -->
+  <div class="page on" id="pg-checkout">
     <div class="card">
-      <div class="card-title">👤 Who's Checking Out?</div>
-      <div class="users-row" id="userChips">
-        <div class="user-chip" onclick="selectUser(this,'Garrett')">Garrett</div>
-        <div class="user-chip" onclick="selectUser(this,'Friend')">Friend</div>
+      <div class="ctitle">👤 Who's Checking Out?</div>
+      <div class="chips" id="chips">
+        <div class="chip" onclick="selU(this,'Garrett')">Garrett</div>
+        <div class="chip" onclick="selU(this,'Friend')">Friend</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input type="text" class="form-input" id="newUserInput" placeholder="Add another name..." style="max-width:200px;" onkeydown="if(event.key==='Enter')addUser()" />
-        <button class="btn btn-outline btn-sm" onclick="addUser()">+ Add</button>
+      <div class="aur">
+        <input type="text" class="fi" id="nuInput" placeholder="Add name..." onkeydown="if(event.key==='Enter')addU()"/>
+        <button class="btn bo bsm" onclick="addU()">+ Add</button>
       </div>
     </div>
 
-    <!-- Entry -->
     <div class="card">
-      <div class="card-title">📦 Equipment Entry</div>
-      <div class="entry-tabs">
-        <button class="etab active" onclick="switchEntry('scan')" id="etab-scan">📷 AI Photo Scan</button>
-        <button class="etab" onclick="switchEntry('manual')" id="etab-manual">✏️ Manual Entry</button>
+      <div class="ctitle">📦 Equipment Entry</div>
+      <div class="mtog">
+        <button class="mt on" onclick="swMode('scan')" id="mt-scan">📷 AI Scan</button>
+        <button class="mt" onclick="swMode('manual')" id="mt-manual">✏️ Manual</button>
       </div>
 
-      <!-- SCAN -->
       <div id="scanMode">
-        <div class="section-note">Snap or upload a photo — Claude AI reads the name, serial number & barcode.</div>
-        <div class="upload-zone" id="dropZone"
-          ondragover="event.preventDefault();this.classList.add('drag')"
-          ondragleave="this.classList.remove('drag')"
-          ondrop="handleDrop(event)">
-          <input type="file" accept="image/*" capture="environment" onchange="handleFile(event)" />
-          <div class="upload-icon">📸</div>
-          <div class="upload-text">Tap to take/upload photo</div>
-          <div class="upload-sub">JPG, PNG — drag & drop works too</div>
+        <div class="note">Snap a photo — Claude AI reads the name, serial number & barcode for you.</div>
+        <div class="dz" id="dz">
+          <input type="file" accept="image/*" capture="environment" onchange="handleFile(event)"/>
+          <div class="dzi">📸</div>
+          <div class="dzt">Tap to open camera</div>
+          <div class="dzs">or choose from photos</div>
         </div>
-
-        <div id="imgPreview" style="display:none;">
-          <img id="previewImg" class="preview-img" />
-          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
-            <button class="btn btn-primary" id="scanBtn" onclick="scanImage()">🤖 Scan with Claude</button>
-            <button class="btn btn-outline btn-sm" onclick="clearImg()">✕ Clear</button>
+        <div id="imgPrev" style="display:none;">
+          <img id="pimg" class="pimg"/>
+          <div class="brow">
+            <button class="btn bp" id="scanbtn" onclick="doScan()">🤖 Scan with AI</button>
+            <button class="btn bo bsm" onclick="clearImg()">✕ Clear</button>
           </div>
         </div>
-
-        <div id="scanStatus" style="display:none;">
-          <div class="spinner-wrap">
-            <div class="spinner"></div>
-            <span id="scanText">Analyzing with Claude AI...</span>
-          </div>
+        <div id="scanSpin" style="display:none;">
+          <div class="sw"><div class="sp"></div><span id="scanMsg">Analyzing...</span></div>
         </div>
       </div>
 
-      <!-- MANUAL -->
       <div id="manualMode" style="display:none;">
-        <div class="section-note">For small items without barcodes — enter info directly.</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Equipment Name *</label>
-            <input type="text" class="form-input" id="m_name" placeholder="e.g. Ethernet Cable Cat6" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Type / Category</label>
-            <input type="text" class="form-input" id="m_type" placeholder="e.g. Cable, Adapter" />
-          </div>
+        <div class="note">For cables, adapters & small items without barcodes.</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Name *</label><input type="text" class="fi" id="m_name" placeholder="e.g. Cat6 Cable"/></div>
+          <div class="fg"><label class="fl">Type</label><input type="text" class="fi" id="m_type" placeholder="e.g. Cable"/></div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Serial Number</label>
-            <input type="text" class="form-input" id="m_serial" placeholder="If available" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Barcode / Asset Tag</label>
-            <input type="text" class="form-input" id="m_barcode" placeholder="If available" />
-          </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Serial #</label><input type="text" class="fi" id="m_serial" placeholder="If available"/></div>
+          <div class="fg"><label class="fl">Barcode</label><input type="text" class="fi" id="m_barcode" placeholder="If available"/></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Notes</label>
-          <input type="text" class="form-input" id="m_notes" placeholder="Condition, color, quantity..." />
-        </div>
-        <button class="btn btn-primary" onclick="prepManualVerify()">Next → Review & Confirm</button>
+        <div class="fg"><label class="fl">Notes</label><input type="text" class="fi" id="m_notes" placeholder="Condition, color, qty..."/></div>
+        <button class="btn bp bfull" onclick="prepManual()" style="margin-top:4px;">Next → Review</button>
       </div>
     </div>
 
-    <!-- VERIFY -->
-    <div class="card" id="verifyCard" style="display:none;">
-      <div class="card-title">✅ Verify Before Saving to Google Sheets</div>
-      <div class="verify-box">
-        <div class="verify-title">⚠️ Edit any field if AI got it wrong</div>
-
-        <div class="vf"><span class="vk">Equipment</span><div style="flex:1"><input class="vinput" id="v_name" type="text" /></div></div>
-        <div class="vf"><span class="vk">Type</span><div style="flex:1"><input class="vinput" id="v_type" type="text" /></div></div>
-        <div class="vf"><span class="vk">Serial #</span><div style="flex:1"><input class="vinput" id="v_serial" type="text" /></div></div>
-        <div class="vf"><span class="vk">Barcode</span><div style="flex:1"><input class="vinput" id="v_barcode" type="text" /></div></div>
-        <div class="vf"><span class="vk">Notes</span><div style="flex:1"><input class="vinput" id="v_notes" type="text" /></div></div>
-
-        <div id="confSection" style="display:none;margin-top:8px;">
-          <div class="conf-label">AI Confidence</div>
-          <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
-          <div class="conf-label" id="confText"></div>
+    <div class="card" id="vcard" style="display:none;">
+      <div class="ctitle">✅ Verify Before Saving</div>
+      <div class="vbox">
+        <div class="vbt">⚠️ Edit anything that looks wrong</div>
+        <div class="vr"><span class="vk">Equipment</span><input class="vi" id="v_name" type="text"/></div>
+        <div class="vr"><span class="vk">Type</span><input class="vi" id="v_type" type="text"/></div>
+        <div class="vr"><span class="vk">Serial #</span><input class="vi" id="v_serial" type="text"/></div>
+        <div class="vr"><span class="vk">Barcode</span><input class="vi" id="v_barcode" type="text"/></div>
+        <div class="vr"><span class="vk">Notes</span><input class="vi" id="v_notes" type="text"/></div>
+        <div id="confW" style="display:none;">
+          <div class="cbar"><div class="cfill" id="cfill" style="width:0%"></div></div>
+          <div class="clbl" id="clbl"></div>
         </div>
       </div>
-
-      <div class="vf" style="margin-top:12px;">
-        <span class="vk" style="min-width:100px;">Checked out by</span>
-        <strong id="v_user" style="color:var(--accent);"></strong>
+      <div style="font-size:.76rem;color:var(--muted);margin-bottom:4px;">
+        <span style="color:var(--accent);font-weight:700;" id="v_user"></span>
+        &nbsp;·&nbsp;<span id="v_dt" style="font-family:JetBrains Mono,monospace;font-size:.68rem;"></span>
       </div>
-      <div class="vf">
-        <span class="vk" style="min-width:100px;">Date / Time</span>
-        <span id="v_datetime" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);"></span>
+      <div class="brow">
+        <button class="btn bg" id="confbtn" onclick="confirmCO()">✔ Save to Sheets</button>
+        <button class="btn bo bsm" onclick="cancelV()">Cancel</button>
       </div>
-
-      <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn btn-green" id="confirmBtn" onclick="confirmCheckout()">✔ Confirm → Save to Sheets</button>
-        <button class="btn btn-outline" onclick="cancelVerify()">✕ Cancel</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ── CHECK IN ─────────────────────────────────────────────── -->
-  <div id="page-checkin" style="display:none;">
-    <div class="card">
-      <div class="card-title">📥 Currently Checked Out</div>
-      <div id="checkedOutList"><div class="empty"><div class="empty-icon">📥</div>Load the log to see checked out items.</div></div>
-      <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="loadCheckin()">🔄 Refresh from Sheets</button>
     </div>
   </div>
 
-  <!-- ── LOG ──────────────────────────────────────────────────── -->
-  <div id="page-log" style="display:none;">
+  <!-- CHECKIN -->
+  <div class="page" id="pg-checkin">
     <div class="card">
-      <div class="card-title">📋 Full Activity Log — Live from Google Sheets</div>
-      <div id="logWrap">
-        <div class="empty"><div class="empty-icon">📋</div>Click Refresh to load the log.</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn btn-outline btn-sm" onclick="loadLog()">🔄 Refresh</button>
-      </div>
+      <div class="ctitle">📥 Currently Checked Out</div>
+      <div id="ciList"><div class="es"><div class="ei">📥</div><div class="et">Tap Refresh to load</div></div></div>
+      <button class="btn bo bsm bfull" style="margin-top:10px;" onclick="loadCI()">🔄 Refresh</button>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="page" id="pg-log">
+    <div class="card">
+      <div class="ctitle">📋 Activity Log</div>
+      <div id="logW"><div class="es"><div class="ei">📋</div><div class="et">Tap Refresh to load</div></div></div>
+      <button class="btn bo bsm bfull" style="margin-top:10px;" onclick="loadLog()">🔄 Refresh from Sheets</button>
     </div>
   </div>
 
 </div>
 
-<div class="toast" id="toast" style="display:none;"></div>
+<div class="btabs">
+  <button class="bt on" onclick="swPage('checkout')" id="bt-checkout"><span class="i">📤</span>Check Out</button>
+  <button class="bt" onclick="swPage('checkin')" id="bt-checkin"><span class="i">📥</span>Check In</button>
+  <button class="bt" onclick="swPage('log')" id="bt-log"><span class="i">📋</span>Log</button>
+</div>
+
+<div id="toast"></div>
 
 <script>
-// ── CONFIG ─────────────────────────────────────────────────────────
-const cfg = { apiKey: '', scriptUrl: '' };
+// ── Hardcoded — no login needed ─────────────────────────────────
+const SURL = "https://script.google.com/macros/s/AKfycby8Y63rSngEKzlKEpJoV3qcAs7jhBDJjfVktsyNwJfgez1O54CE1liJUXP3ou-nJ1uK/exec";
 
-// ── STATE ──────────────────────────────────────────────────────────
-let selectedUser = '';
-let imgB64 = null;
-let imgMime = 'image/jpeg';
-let pendingFromAI = false;
-let cachedLog = [];
+let usr="", b64=null, mime="image/jpeg", ai=false, cache=[];
 
-// ── TABS ───────────────────────────────────────────────────────────
-function switchTab(t) {
-  ['checkout','checkin','log'].forEach(x => {
-    document.getElementById('page-'+x).style.display = x===t ? '' : 'none';
-    document.getElementById('tab-'+x).classList.toggle('active', x===t);
+function swPage(p) {
+  ["checkout","checkin","log"].forEach(x => {
+    document.getElementById("pg-"+x).classList.toggle("on", x===p);
+    document.getElementById("bt-"+x).classList.toggle("on", x===p);
   });
-  if (t==='checkin') loadCheckin();
-  if (t==='log') loadLog();
+  document.getElementById("scr").scrollTop = 0;
+  if (p==="checkin") loadCI();
+  if (p==="log") loadLog();
 }
 
-function switchEntry(m) {
-  document.getElementById('scanMode').style.display = m==='scan' ? '' : 'none';
-  document.getElementById('manualMode').style.display = m==='manual' ? '' : 'none';
-  document.getElementById('etab-scan').classList.toggle('active', m==='scan');
-  document.getElementById('etab-manual').classList.toggle('active', m==='manual');
-  document.getElementById('verifyCard').style.display = 'none';
+function swMode(m) {
+  document.getElementById("scanMode").style.display   = m==="scan"   ? "" : "none";
+  document.getElementById("manualMode").style.display = m==="manual" ? "" : "none";
+  document.getElementById("mt-scan").classList.toggle("on", m==="scan");
+  document.getElementById("mt-manual").classList.toggle("on", m==="manual");
+  document.getElementById("vcard").style.display = "none";
 }
 
-// ── USERS ──────────────────────────────────────────────────────────
-function selectUser(el, name) {
-  document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedUser = name;
+function selU(el, name) {
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("on"));
+  el.classList.add("on"); usr = name;
 }
 
-function addUser() {
-  const val = document.getElementById('newUserInput').value.trim();
-  if (!val) return;
-  const c = document.createElement('div');
-  c.className = 'user-chip';
-  c.textContent = val;
-  c.onclick = function(){ selectUser(this, val); };
-  document.getElementById('userChips').appendChild(c);
-  document.getElementById('newUserInput').value = '';
+function addU() {
+  const v = document.getElementById("nuInput").value.trim(); if (!v) return;
+  const c = document.createElement("div"); c.className = "chip"; c.textContent = v;
+  c.onclick = function(){ selU(this, v); };
+  document.getElementById("chips").appendChild(c);
+  document.getElementById("nuInput").value = "";
 }
 
-// ── IMAGE ──────────────────────────────────────────────────────────
-function handleFile(e) { if(e.target.files[0]) loadImg(e.target.files[0]); }
+function handleFile(e) { if (e.target.files[0]) loadImg(e.target.files[0]); }
 
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('dropZone').classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) loadImg(f);
-}
-
-function loadImg(file) {
-  imgMime = file.type || 'image/jpeg';
+function loadImg(f) {
+  mime = f.type || "image/jpeg";
   const r = new FileReader();
   r.onload = ev => {
-    imgB64 = ev.target.result.split(',')[1];
-    document.getElementById('previewImg').src = ev.target.result;
-    document.getElementById('imgPreview').style.display = '';
-    document.getElementById('dropZone').style.display = 'none';
-    document.getElementById('verifyCard').style.display = 'none';
+    b64 = ev.target.result.split(",")[1];
+    document.getElementById("pimg").src = ev.target.result;
+    document.getElementById("imgPrev").style.display = "";
+    document.getElementById("dz").style.display = "none";
+    document.getElementById("vcard").style.display = "none";
   };
-  r.readAsDataURL(file);
+  r.readAsDataURL(f);
 }
 
 function clearImg() {
-  imgB64 = null;
-  document.getElementById('imgPreview').style.display = 'none';
-  document.getElementById('dropZone').style.display = '';
-  document.getElementById('verifyCard').style.display = 'none';
+  b64 = null;
+  document.getElementById("imgPrev").style.display = "none";
+  document.getElementById("dz").style.display = "";
+  document.getElementById("vcard").style.display = "none";
+  document.getElementById("scanSpin").style.display = "none";
+  document.getElementById("scanbtn").disabled = false;
 }
 
-// ── AI SCAN ────────────────────────────────────────────────────────
-async function scanImage() {
-  if (!cfg.apiKey) { toast('⚠️ Enter your Claude API key!', 'yellow'); return; }
-  if (!imgB64)     { toast('⚠️ No image loaded!', 'red'); return; }
-  if (!selectedUser){ toast('⚠️ Select who is checking out!', 'yellow'); return; }
-
-  setScanLoading(true, 'Analyzing image with Claude AI...');
-
-  const prompt = `You are an equipment scanner for a cybersecurity lab. Examine this image carefully.
-
-Extract:
-1. Equipment name/description (e.g. "Cisco Catalyst 2960 Switch", "USB Flash Drive 64GB")
-2. Equipment type/category (e.g. "Network Switch", "Storage", "Cable")
-3. Serial number (look for "S/N:", "Serial:", stickers with alphanumeric codes)
-4. Barcode number (any barcode value, asset tag, or inventory number visible)
-5. Any other notable info (model number, color, condition)
-6. Confidence level 0-100 in the extracted info
-
-CRITICAL: Never make up serial numbers or barcodes. Use "" if not visible.
-
-Respond ONLY with valid JSON, no markdown:
-{"name":"...","type":"...","serial":"...","barcode":"...","notes":"...","confidence":85}`;
-
+async function doScan() {
+  if (!b64)  { toast("No image selected!", "yellow"); return; }
+  if (!usr)  { toast("Select who is checking out!", "yellow"); return; }
+  document.getElementById("scanSpin").style.display = "";
+  document.getElementById("scanbtn").disabled = true;
+  document.getElementById("scanMsg").textContent = "Sending to Claude AI...";
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': cfg.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: imgMime, data: imgB64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
-    });
-
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-
-    const raw = data.content.map(b => b.text||'').join('');
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    setScanLoading(false);
-    populateVerify(parsed, true);
-  } catch(err) {
-    setScanLoading(false);
-    toast('❌ Scan failed: ' + err.message, 'red');
+    const res = await post({ action:"scan", imageB64:b64, mimeType:mime });
+    if (!res.success) throw new Error(res.error);
+    document.getElementById("scanSpin").style.display = "none";
+    document.getElementById("scanbtn").disabled = false;
+    popV(res.result, true);
+  } catch(e) {
+    document.getElementById("scanSpin").style.display = "none";
+    document.getElementById("scanbtn").disabled = false;
+    toast("Scan failed: " + e.message, "red");
   }
 }
 
-function setScanLoading(on, msg='') {
-  document.getElementById('scanStatus').style.display = on ? '' : 'none';
-  document.getElementById('scanText').textContent = msg;
-  document.getElementById('scanBtn').disabled = on;
+function prepManual() {
+  if (!usr) { toast("Select who is checking out!", "yellow"); return; }
+  const n = document.getElementById("m_name").value.trim();
+  if (!n)   { toast("Equipment name required!", "yellow"); return; }
+  popV({ name:n, type:document.getElementById("m_type").value.trim(),
+    serial:document.getElementById("m_serial").value.trim(),
+    barcode:document.getElementById("m_barcode").value.trim(),
+    notes:document.getElementById("m_notes").value.trim(), confidence:null }, false);
 }
 
-// ── MANUAL VERIFY ──────────────────────────────────────────────────
-function prepManualVerify() {
-  if (!selectedUser){ toast('⚠️ Select who is checking out!', 'yellow'); return; }
-  const name = document.getElementById('m_name').value.trim();
-  if (!name){ toast('⚠️ Equipment name required!', 'yellow'); return; }
-  populateVerify({
-    name, type: document.getElementById('m_type').value.trim(),
-    serial: document.getElementById('m_serial').value.trim(),
-    barcode: document.getElementById('m_barcode').value.trim(),
-    notes: document.getElementById('m_notes').value.trim(),
-    confidence: null
-  }, false);
-}
-
-function populateVerify(d, fromAI) {
-  document.getElementById('v_name').value   = d.name    || '';
-  document.getElementById('v_type').value   = d.type    || '';
-  document.getElementById('v_serial').value = d.serial  || '';
-  document.getElementById('v_barcode').value= d.barcode || '';
-  document.getElementById('v_notes').value  = d.notes   || '';
-  document.getElementById('v_user').textContent    = selectedUser;
-  document.getElementById('v_datetime').textContent = new Date().toLocaleString();
-
+function popV(d, fromAI) {
+  document.getElementById("v_name").value    = d.name    || "";
+  document.getElementById("v_type").value    = d.type    || "";
+  document.getElementById("v_serial").value  = d.serial  || "";
+  document.getElementById("v_barcode").value = d.barcode || "";
+  document.getElementById("v_notes").value   = d.notes   || "";
+  document.getElementById("v_user").textContent = usr;
+  document.getElementById("v_dt").textContent   = new Date().toLocaleString();
+  const cw = document.getElementById("confW");
   if (fromAI && d.confidence != null) {
-    document.getElementById('confSection').style.display = '';
-    document.getElementById('confFill').style.width = d.confidence + '%';
-    document.getElementById('confText').textContent =
-      `${d.confidence}% — ${d.confidence>=80?'High confidence':d.confidence>=50?'Medium — double-check':'Low — verify carefully'}`;
-  } else {
-    document.getElementById('confSection').style.display = 'none';
-  }
-
-  pendingFromAI = fromAI;
-  document.getElementById('verifyCard').style.display = '';
-  document.getElementById('verifyCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    cw.style.display = "";
+    document.getElementById("cfill").style.width = d.confidence + "%";
+    document.getElementById("clbl").textContent  = d.confidence + "% — " +
+      (d.confidence>=80 ? "High confidence" : d.confidence>=50 ? "Medium — double check" : "Low — verify carefully");
+  } else { cw.style.display = "none"; }
+  ai = fromAI;
+  const vc = document.getElementById("vcard"); vc.style.display = "";
+  setTimeout(() => vc.scrollIntoView({ behavior:"smooth", block:"start" }), 60);
 }
 
-function cancelVerify(){ document.getElementById('verifyCard').style.display='none'; }
+function cancelV() { document.getElementById("vcard").style.display = "none"; }
 
-// ── CONFIRM → SHEETS ───────────────────────────────────────────────
-async function confirmCheckout() {
-  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL first!', 'yellow'); return; }
-
-  const payload = {
-    action: 'checkout',
-    name:    document.getElementById('v_name').value.trim(),
-    type:    document.getElementById('v_type').value.trim(),
-    serial:  document.getElementById('v_serial').value.trim(),
-    barcode: document.getElementById('v_barcode').value.trim(),
-    notes:   document.getElementById('v_notes').value.trim(),
-    user:    selectedUser,
-    source:  pendingFromAI ? 'AI Scan' : 'Manual'
+async function confirmCO() {
+  const p = {
+    action:"checkout",
+    name:   document.getElementById("v_name").value.trim(),
+    type:   document.getElementById("v_type").value.trim(),
+    serial: document.getElementById("v_serial").value.trim(),
+    barcode:document.getElementById("v_barcode").value.trim(),
+    notes:  document.getElementById("v_notes").value.trim(),
+    user: usr, source: ai ? "AI Scan" : "Manual"
   };
-
-  if (!payload.name){ toast('⚠️ Equipment name required!', 'yellow'); return; }
-
-  const btn = document.getElementById('confirmBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Saving to Sheets...';
-
+  if (!p.name) { toast("Equipment name required!", "yellow"); return; }
+  const btn = document.getElementById("confbtn");
+  btn.disabled = true; btn.textContent = "Saving...";
   try {
-    const res = await fetch(cfg.scriptUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Unknown error');
-
-    toast(`✅ "${payload.name}" saved to Google Sheets!`, 'green');
-    document.getElementById('verifyCard').style.display = 'none';
+    const res = await post(p);
+    if (!res.success) throw new Error(res.error);
+    toast("Saved to Google Sheets!", "green");
+    document.getElementById("vcard").style.display = "none";
     clearImg();
-    ['m_name','m_type','m_serial','m_barcode','m_notes'].forEach(id => document.getElementById(id).value='');
-  } catch(err) {
-    toast('❌ Sheets error: ' + err.message, 'red');
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '✔ Confirm → Save to Sheets';
+    ["m_name","m_type","m_serial","m_barcode","m_notes"].forEach(id => document.getElementById(id).value = "");
+  } catch(e) { toast("Error: " + e.message, "red"); }
+  btn.disabled = false; btn.innerHTML = "✔ Save to Sheets";
 }
 
-// ── CHECKIN ────────────────────────────────────────────────────────
-async function loadCheckin() {
-  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
-  const list = document.getElementById('checkedOutList');
-  list.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><span>Loading from Sheets...</span></div>';
+async function loadCI() {
+  const l = document.getElementById("ciList");
+  l.innerHTML = '<div class="sw"><div class="sp"></div><span>Loading...</span></div>';
   try {
-    const res = await fetch(cfg.scriptUrl + '?action=getLog');
-    const data = await res.json();
-    cachedLog = data.log || [];
-    renderCheckedOut();
-  } catch(err) {
-    list.innerHTML = `<div class="empty">❌ Error: ${err.message}</div>`;
-  }
+    const res = await get("getLog"); cache = res.log || []; renderCI();
+  } catch(e) { l.innerHTML = '<div class="es">' + e.message + '</div>'; }
 }
 
-function renderCheckedOut() {
-  const list = document.getElementById('checkedOutList');
-  const out = cachedLog.filter(e => e.status === 'OUT');
-  if (!out.length) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div>All equipment is checked in!</div>';
-    return;
-  }
-  list.innerHTML = out.map(e => `
-    <div class="ci-item">
-      <div>
-        <div class="ci-name">${e.name}</div>
-        <div class="ci-meta">
-          ${e.type ? e.type+' · ':''}
-          ${e.serial ? 'S/N: '+e.serial+' · ':''}
-          ${e.barcode ? 'BC: '+e.barcode+' · ':''}
-          By <strong style="color:var(--accent)">${e.user}</strong>
-          on ${e.checkoutDate} ${e.checkoutTime}
-        </div>
+function renderCI() {
+  const l = document.getElementById("ciList");
+  const out = cache.filter(e => e.status === "OUT");
+  if (!out.length) { l.innerHTML = '<div class="es"><div class="ei">✅</div><div class="et">All equipment is checked in!</div></div>'; return; }
+  l.innerHTML = out.map(e => `
+    <div class="ci">
+      <div class="cin">
+        <div class="cname">${e.name}</div>
+        <div class="cmeta">${e.type?e.type+" · ":""}${e.serial?"S/N: "+e.serial+" · ":""}${e.barcode?"BC: "+e.barcode+" · ":""}<span style="color:var(--accent)">${e.user}</span> · ${e.checkoutDate} ${e.checkoutTime}</div>
       </div>
-      <button class="btn btn-green btn-sm" onclick="checkIn('${e.id}','${e.name}')">📥 Check In</button>
+      <button class="btn bg bsm" onclick="doCI('${e.id}','${e.name.replace(/'/g,"&#39;")}')">📥 In</button>
     </div>
-  `).join('');
+  `).join("");
 }
 
-async function checkIn(id, name) {
-  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
+async function doCI(id, name) {
   try {
-    const res = await fetch(cfg.scriptUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'checkin', id })
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error);
-    toast(`📥 "${name}" checked in to Sheets!`, 'green');
-    await loadCheckin();
-  } catch(err) {
-    toast('❌ ' + err.message, 'red');
-  }
+    const res = await post({ action:"checkin", id });
+    if (!res.success) throw new Error(res.error);
+    toast('"' + name + '" checked in!', "green");
+    await loadCI();
+  } catch(e) { toast(e.message, "red"); }
 }
 
-// ── LOG ────────────────────────────────────────────────────────────
 async function loadLog() {
-  if (!cfg.scriptUrl){ toast('⚠️ Enter your Apps Script URL!', 'yellow'); return; }
-  const wrap = document.getElementById('logWrap');
-  wrap.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><span>Fetching from Google Sheets...</span></div>';
+  const w = document.getElementById("logW");
+  w.innerHTML = '<div class="sw"><div class="sp"></div><span>Fetching from Sheets...</span></div>';
   try {
-    const res = await fetch(cfg.scriptUrl + '?action=getLog');
-    const data = await res.json();
-    cachedLog = data.log || [];
-    if (!cachedLog.length) {
-      wrap.innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No entries yet.</div>';
-      return;
-    }
-    wrap.innerHTML = `<div style="overflow-x:auto;">
-      <table class="log-table">
-        <thead><tr>
-          <th>Status</th><th>Equipment</th><th>Serial / Barcode</th>
-          <th>User</th><th>Checkout</th><th>Checkin</th><th>Notes</th>
-        </tr></thead>
-        <tbody>
-          ${cachedLog.map(e => `
-            <tr>
-              <td><span class="badge ${e.status==='OUT'?'badge-out':'badge-in'}">${e.status}</span></td>
-              <td><strong>${e.name}</strong>${e.type?'<br><span style="color:var(--muted);font-size:.68rem;">'+e.type+'</span>':''}</td>
-              <td style="font-family:'JetBrains Mono',monospace;font-size:.68rem;">
-                ${e.serial?'S/N: '+e.serial+'<br>':''}
-                ${e.barcode?'BC: '+e.barcode:''}
-                ${!e.serial&&!e.barcode?'<span style="color:var(--muted)">—</span>':''}
-              </td>
-              <td style="color:var(--accent);font-weight:600;">${e.user}</td>
-              <td style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);">${e.checkoutDate}<br>${e.checkoutTime}</td>
-              <td style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);">
-                ${e.checkinDate ? e.checkinDate+'<br>'+e.checkinTime : '<span style="color:var(--red)">—</span>'}
-              </td>
-              <td style="font-size:.73rem;color:var(--muted);">${e.notes||'—'}<br><span style="font-size:.62rem;opacity:.5;">${e.source||''}</span></td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>`;
-  } catch(err) {
-    wrap.innerHTML = `<div class="empty">❌ Error: ${err.message}</div>`;
-  }
+    const res = await get("getLog"); cache = res.log || [];
+    if (!cache.length) { w.innerHTML = '<div class="es"><div class="ei">📋</div><div class="et">No entries yet.</div></div>'; return; }
+    w.innerHTML = `<div class="ls"><table><thead><tr>
+      <th>Status</th><th>Equipment</th><th>S/N · BC</th><th>User</th><th>Out</th><th>In</th>
+    </tr></thead><tbody>${cache.map(e => `<tr>
+      <td><span class="badge ${e.status==="OUT"?"bout":"bin"}">${e.status}</span></td>
+      <td><strong>${e.name}</strong>${e.type?'<br><span style="color:var(--muted);font-size:.6rem;">'+e.type+'</span>':''}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:.62rem;">${e.serial?"S/N: "+e.serial+"<br>":""}${e.barcode?"BC: "+e.barcode:""}${!e.serial&&!e.barcode?'<span style="color:var(--muted)">—</span>':''}</td>
+      <td style="color:var(--accent);font-weight:700;">${e.user}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:.6rem;color:var(--muted);">${e.checkoutDate}<br>${e.checkoutTime}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:.6rem;color:var(--muted);">${e.checkinDate?e.checkinDate+"<br>"+e.checkinTime:'<span style="color:var(--red)">—</span>'}</td>
+    </tr>`).join("")}</tbody></table></div>`;
+  } catch(e) { w.innerHTML = '<div class="es">' + e.message + '</div>'; }
 }
 
-// ── TOAST ──────────────────────────────────────────────────────────
+async function post(d) { const r = await fetch(SURL, { method:"POST", body:JSON.stringify(d) }); return r.json(); }
+async function get(a)  { const r = await fetch(SURL + "?action=" + a); return r.json(); }
+
 function toast(msg, type) {
-  const el = document.getElementById('toast');
+  const el = document.getElementById("toast");
   el.textContent = msg;
-  el.style.display = 'flex';
-  el.style.borderColor = type==='red'?'var(--red)':type==='green'?'var(--green)':type==='yellow'?'var(--yellow)':'var(--border)';
+  el.style.borderColor = type==="red"?"var(--red)":type==="green"?"var(--green)":type==="yellow"?"var(--yellow)":"var(--border)";
+  el.style.display = "block";
   clearTimeout(window._tt);
-  window._tt = setTimeout(()=>el.style.display='none', 3500);
+  window._tt = setTimeout(() => el.style.display = "none", 3200);
 }
 </script>
 </body>
