@@ -178,7 +178,7 @@ td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top
 </div>
 <div id="toast"></div>
 <script>
-const SURL = "https://ltu2ywen0.execute-api.us-east-1.amazonaws.com/prod/tracker";
+const SURL = "https://ltu2yhwen0.execute-api.us-east-1.amazonaws.com/prod/tracker";
 let usr="", b64=null, mime="image/jpeg", ai=false, cache=[];
 function swPage(p){["checkout","checkin","log"].forEach(x=>{document.getElementById("pg-"+x).classList.toggle("on",x===p);document.getElementById("bt-"+x).classList.toggle("on",x===p);});document.getElementById("scr").scrollTop=0;if(p==="checkin")loadCI();if(p==="log")loadLog();}
 function swMode(m){document.getElementById("scanMode").style.display=m==="scan"?"":"none";document.getElementById("manualMode").style.display=m==="manual"?"":"none";document.getElementById("mt-scan").classList.toggle("on",m==="scan");document.getElementById("mt-manual").classList.toggle("on",m==="manual");document.getElementById("vcard").style.display="none";}
