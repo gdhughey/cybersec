@@ -310,7 +310,7 @@ async function doMfaVerify(){
 }
 function saveTok(a){sessionStorage.setItem('cl_acc',a.AccessToken||'');sessionStorage.setItem('cl_tok',a.IdToken);sessionStorage.setItem('cl_exp',Date.now()+(a.ExpiresIn*1000));var rm=document.getElementById('rememberMe');if(rm&&rm.checked&&a.RefreshToken){rmEncrypt(JSON.stringify({rt:a.RefreshToken,exp:Date.now()+30*24*60*60*1000})).then(function(enc){localStorage.setItem('cl_rm',enc);}).catch(function(){});}hideLogin();}
 function logout(){sessionStorage.removeItem('cl_tok');sessionStorage.removeItem('cl_exp');sessionStorage.removeItem('cl_acc');localStorage.removeItem('cl_rm');showOnly('lf');document.getElementById('lp').value='';document.getElementById('mc1').value='';document.getElementById('mc2').value='';showLogin();}
-(async function(){var t=sessionStorage.getItem('cl_tok'),e=sessionStorage.getItem('cl_exp');if(t&&e&&Date.now()<parseInt(e)){return;}if(await checkRm()){return;}showLogin();})();
+// startup moved below (checkRm defined in next script block)
 var _it;function _rt(){clearTimeout(_it);_it=setTimeout(function(){logout();document.getElementById('le').textContent='Session expired after 15 minutes.';},15*60*1000);}
 ['mousemove','keydown','click','touchstart','scroll'].forEach(function(ev){document.addEventListener(ev,_rt,true);});_rt();
 </script><div id="adminOv" style="display:none;position:fixed;inset:0;background:#0a0f1a;z-index:8000;overflow-y:auto;">
@@ -371,7 +371,7 @@ async function loadAdminUsers(){
         +(isAdm
           ?"<button data-un='"+u.username+"' data-act='removeAdmin' style='background:#0f172a;color:#f87171;border:1px solid #f87171;border-radius:5px;padding:.28rem .6rem;cursor:pointer;font-size:.78rem;'>Remove Admin</button>"
           :"<button data-un='"+u.username+"' data-act='makeAdmin' style='background:#0f172a;color:#34d399;border:1px solid #34d399;border-radius:5px;padding:.28rem .6rem;cursor:pointer;font-size:.78rem;'>Make Admin</button>")
-        +"<button data-un='"+u.username+"' data-act='deleteUser' style='background:#0f172a;color:#ef4444;border:1px solid #ef4444;border-radius:5px;padding:.28rem .5rem;cursor:pointer;font-size:.78rem;margin-left:.2rem;'>&#128465;</button>"+"</div></div>";
+        +"<button data-un='"+u.username+"' data-act='deleteUser' style='background:#7f1d1d;color:#fca5a5;border:2px solid #ef4444;border-radius:6px;padding:.4rem 1rem;cursor:pointer;font-size:.9rem;font-weight:700;margin-left:.4rem;'>&#128465;</button>"+"</div></div>";
     }).join("");
     ul.onclick=function(e){
       var btn=e.target.closest("[data-act]");if(!btn)return;
@@ -458,5 +458,12 @@ async function adminDeleteUser(un){
   if(d.success){alert(un+" deleted successfully.");}else{alert("Error: "+d.error);}
   loadAdminUsers();
 }
+// ── Startup: run after all functions defined ──
+(async function(){
+  var t=sessionStorage.getItem('cl_tok'),e=sessionStorage.getItem('cl_exp');
+  if(t&&e&&Date.now()<parseInt(e)){return;}
+  if(await checkRm()){return;}
+  showLogin();
+})();
 </script></body>
 </html>
