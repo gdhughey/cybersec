@@ -342,68 +342,79 @@ var _it;function _rt(){clearTimeout(_it);_it=setTimeout(function(){logout();docu
 <div id="cpErr" style="color:#f87171;font-size:.82rem;margin-top:.6rem;min-height:1em;"></div>
 </div></div><script>
 function toggleGear(){
-  var d=document.getElementById('gearDrop');
-  d.style.display=d.style.display==='block'?'none':'block';
-  try{var p=JSON.parse(atob(sessionStorage.getItem('cl_tok').split('.')[1]));var g=p['cognito:groups']||[];document.getElementById('adminMI').style.display=g.indexOf('admins')!==-1?'block':'none';}catch(e){}
+  var d=document.getElementById("gearDrop");
+  d.style.display=d.style.display==="block"?"none":"block";
+  try{var p=JSON.parse(atob(sessionStorage.getItem("cl_tok").split(".")[1]));var g=p["cognito:groups"]||[];document.getElementById("adminMI").style.display=g.indexOf("admins")!==-1?"block":"none";}catch(e){}
 }
-document.addEventListener('click',function(e){var gw=document.getElementById('gearWrap');if(gw&&!gw.contains(e.target)){var d=document.getElementById('gearDrop');if(d)d.style.display='none';}});
-function getGroups(){try{var p=JSON.parse(atob(sessionStorage.getItem('cl_tok').split('.')[1]));return p['cognito:groups']||[];}catch(e){return[];}}
-function showAdmin(){document.getElementById('gearDrop').style.display='none';document.getElementById('adminOv').style.display='block';loadAdminUsers();}
-function hideAdmin(){document.getElementById('adminOv').style.display='none';}
+document.addEventListener("click",function(e){
+  var gw=document.getElementById("gearWrap");
+  if(gw&&!gw.contains(e.target)){var d=document.getElementById("gearDrop");if(d)d.style.display="none";}
+});
+function showAdmin(){document.getElementById("gearDrop").style.display="none";document.getElementById("adminOv").style.display="block";loadAdminUsers();}
+function hideAdmin(){document.getElementById("adminOv").style.display="none";}
 async function loadAdminUsers(){
-  document.getElementById('adminUL').innerHTML='<div style="color:#64748b;padding:1.5rem;text-align:center;">Loading...</div>';
+  var ul=document.getElementById("adminUL");
+  ul.innerHTML="<div style='color:#64748b;padding:1.5rem;text-align:center;'>Loading...</div>";
   try{
-    var r=await fetch(SURL+'?action=adminListUsers');var d=await r.json();
-    if(!d.success){document.getElementById('adminUL').innerHTML='<div style="color:#f87171;">'+d.error+'</div>';return;}
-    document.getElementById('adminUL').innerHTML=d.users.map(function(u){
-      var isAdm=u.groups.indexOf('admins')!==-1;
-      var sc=u.status==='CONFIRMED'?'#34d399':u.status==='FORCE_CHANGE_PASSWORD'?'#fbbf24':'#94a3b8';
-      return '<div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.9rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">'+
-        '<div><span style="color:#e2e8f0;font-weight:600;">'+u.username+'</span>'+
-        (isAdm?'<span style="background:#1e3a5f;color:#38bdf8;font-size:.68rem;padding:.1rem .35rem;border-radius:4px;margin-left:.4rem;">ADMIN</span>':'')+
-        '<br><span style="color:'+sc+';font-size:.72rem;">'+u.status+'</span></div>'+
-        '<div style="display:flex;gap:.35rem;flex-wrap:wrap;">'+
-        '<button onclick="adminReset(''+u.username+'')" style="background:#0f172a;color:#fbbf24;border:1px solid #fbbf24;border-radius:5px;padding:.28rem .55rem;cursor:pointer;font-size:.75rem;">Reset PW</button>'+
-        (isAdm?'<button onclick="adminToggle(''+u.username+'',true)" style="background:#0f172a;color:#f87171;border:1px solid #f87171;border-radius:5px;padding:.28rem .55rem;cursor:pointer;font-size:.75rem;">Remove Admin</button>':
-               '<button onclick="adminToggle(''+u.username+'',false)" style="background:#0f172a;color:#34d399;border:1px solid #34d399;border-radius:5px;padding:.28rem .55rem;cursor:pointer;font-size:.75rem;">Make Admin</button>')+
-        '</div></div>';
-    }).join('');
-  }catch(e){document.getElementById('adminUL').innerHTML='<div style="color:#f87171;">'+e.message+'</div>';}
+    var r=await fetch(SURL+"?action=adminListUsers");
+    var d=await r.json();
+    if(!d.success){ul.innerHTML="<div style='color:#f87171;'>"+d.error+"</div>";return;}
+    ul.innerHTML=d.users.map(function(u){
+      var isAdm=u.groups.indexOf("admins")!==-1;
+      var sc=u.status==="CONFIRMED"?"#34d399":u.status==="FORCE_CHANGE_PASSWORD"?"#fbbf24":"#94a3b8";
+      return "<div style='background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.9rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;'>"
+        +"<div><span style='color:#e2e8f0;font-weight:600;'>"+u.username+"</span>"
+        +(isAdm?"<span style='background:#1e3a5f;color:#38bdf8;font-size:.68rem;padding:.15rem .4rem;border-radius:4px;margin-left:.4rem;'>ADMIN</span>":"")
+        +"<br><span style='color:"+sc+";font-size:.72rem;'>"+u.status+"</span></div>"
+        +"<div style='display:flex;gap:.35rem;flex-wrap:wrap;'>"
+        +"<button data-un='"+u.username+"' data-act='reset' style='background:#0f172a;color:#fbbf24;border:1px solid #fbbf24;border-radius:5px;padding:.28rem .6rem;cursor:pointer;font-size:.78rem;'>Reset PW</button>"
+        +(isAdm
+          ?"<button data-un='"+u.username+"' data-act='removeAdmin' style='background:#0f172a;color:#f87171;border:1px solid #f87171;border-radius:5px;padding:.28rem .6rem;cursor:pointer;font-size:.78rem;'>Remove Admin</button>"
+          :"<button data-un='"+u.username+"' data-act='makeAdmin' style='background:#0f172a;color:#34d399;border:1px solid #34d399;border-radius:5px;padding:.28rem .6rem;cursor:pointer;font-size:.78rem;'>Make Admin</button>")
+        +"</div></div>";
+    }).join("");
+    ul.onclick=function(e){
+      var btn=e.target.closest("[data-act]");if(!btn)return;
+      var un=btn.getAttribute("data-un"),act=btn.getAttribute("data-act");
+      if(act==="reset")adminReset(un);
+      else if(act==="removeAdmin")adminToggle(un,true);
+      else if(act==="makeAdmin")adminToggle(un,false);
+    };
+  }catch(e){ul.innerHTML="<div style='color:#f87171;'>"+e.message+"</div>";}
 }
 async function adminReset(un){
-  var np=prompt('New temporary password for '+un+' (min 8 chars):');
-  if(!np||np.length<8){if(np!==null)alert('Must be at least 8 characters');return;}
-  var r=await fetch(SURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'adminResetPassword',username:un,tempPassword:np})});
+  var np=prompt("New temporary password for "+un+" (min 8 chars):");
+  if(np===null)return;
+  if(np.length<8){alert("Must be at least 8 characters");return;}
+  var r=await fetch(SURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"adminResetPassword",username:un,tempPassword:np})});
   var d=await r.json();
-  if(d.success){alert(un+' password reset. They must change it on next login.');}else{alert('Error: '+d.error);}
+  if(d.success){alert(un+" password reset. They must change it on next login.");}else{alert("Error: "+d.error);}
   loadAdminUsers();
 }
 async function adminToggle(un,rem){
-  var r=await fetch(SURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'adminToggleAdmin',username:un,remove:rem})});
-  var d=await r.json();
-  if(!d.success)alert('Error: '+d.error);
-  loadAdminUsers();
+  var r=await fetch(SURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"adminToggleAdmin",username:un,remove:rem})});
+  var d=await r.json();if(!d.success)alert("Error: "+d.error);loadAdminUsers();
 }
 async function adminCreateUser(){
-  var un=document.getElementById('nuName').value.trim(),pw=document.getElementById('nuPass').value,isAdm=document.getElementById('nuAdmin').checked;
-  if(!un||!pw){document.getElementById('nuErr').textContent='Username and password required';return;}
-  if(pw.length<8){document.getElementById('nuErr').textContent='Password must be at least 8 characters';return;}
-  var r=await fetch(SURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'adminCreateUser',username:un,tempPassword:pw,makeAdmin:isAdm})});
+  var un=document.getElementById("nuName").value.trim(),pw=document.getElementById("nuPass").value,isAdm=document.getElementById("nuAdmin").checked;
+  if(!un||!pw){document.getElementById("nuErr").textContent="Username and password required";return;}
+  if(pw.length<8){document.getElementById("nuErr").textContent="Password must be at least 8 characters";return;}
+  var r=await fetch(SURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"adminCreateUser",username:un,tempPassword:pw,makeAdmin:isAdm})});
   var d=await r.json();
-  if(d.success){document.getElementById('nuName').value='';document.getElementById('nuPass').value='';document.getElementById('nuAdmin').checked=false;document.getElementById('nuErr').textContent='';loadAdminUsers();}
-  else{document.getElementById('nuErr').textContent=d.error||'Failed';}
+  if(d.success){document.getElementById("nuName").value="";document.getElementById("nuPass").value="";document.getElementById("nuAdmin").checked=false;document.getElementById("nuErr").textContent="";loadAdminUsers();}
+  else{document.getElementById("nuErr").textContent=d.error||"Failed";}
 }
-function showChp(){document.getElementById('gearDrop').style.display='none';document.getElementById('chpOv').style.display='flex';}
-function hideChp(){document.getElementById('chpOv').style.display='none';['cpOld','cpN1','cpN2'].forEach(function(x){document.getElementById(x).value='';});document.getElementById('cpErr').textContent='';}
+function showChp(){document.getElementById("gearDrop").style.display="none";document.getElementById("chpOv").style.display="flex";}
+function hideChp(){document.getElementById("chpOv").style.display="none";["cpOld","cpN1","cpN2"].forEach(function(x){document.getElementById(x).value="";});document.getElementById("cpErr").textContent="";}
 async function doChgPass(){
-  var old=document.getElementById('cpOld').value,np=document.getElementById('cpN1').value,np2=document.getElementById('cpN2').value;
-  if(np!==np2){document.getElementById('cpErr').textContent='Passwords do not match';return;}
-  if(np.length<8){document.getElementById('cpErr').textContent='Minimum 8 characters';return;}
-  var acc=sessionStorage.getItem('cl_acc');
-  if(!acc){document.getElementById('cpErr').textContent='Session error, please log out and back in';return;}
-  var r=await cog('ChangePassword',{AccessToken:acc,PreviousPassword:old,ProposedPassword:np});
-  if(r.__type||r.message){document.getElementById('cpErr').textContent=r.message||'Failed';}
-  else{hideChp();alert('Password changed successfully!');}
+  var old=document.getElementById("cpOld").value,np=document.getElementById("cpN1").value,np2=document.getElementById("cpN2").value;
+  if(np!==np2){document.getElementById("cpErr").textContent="Passwords do not match";return;}
+  if(np.length<8){document.getElementById("cpErr").textContent="Minimum 8 characters";return;}
+  var acc=sessionStorage.getItem("cl_acc");
+  if(!acc){document.getElementById("cpErr").textContent="Session error, please log out and back in";return;}
+  var res=await cog("ChangePassword",{AccessToken:acc,PreviousPassword:old,ProposedPassword:np});
+  if(res.__type||res.message){document.getElementById("cpErr").textContent=res.message||"Failed";}
+  else{hideChp();alert("Password changed!");}
 }
 </script></body>
 </html>
