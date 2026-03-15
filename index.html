@@ -109,10 +109,10 @@ td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top
           <input type="file" accept="image/*" onchange="handleFile(event)"/>
           <div class="dzi">📸</div>
           <div class="dzt">📷 Take photo or 🖼️ choose from library</div>
-          <div class="dzs">or choose from photos</div>
+          <div class="dzs">Select multiple photos for best results</div>
         </div>
         <div id="imgPrev" style="display:none;">
-          <img id="pimg" class="pimg"/>
+          <div id="imgGrid" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px;"></div>
           <div class="brow">
             <button class="btn bp" id="scanbtn" onclick="doScan()">🤖 Scan with AI</button>
             <button class="btn bo bsm" onclick="clearImg()">✕ Clear</button>
@@ -193,10 +193,31 @@ function swPage(p,fromPop){
 function swMode(m){document.getElementById("scanMode").style.display=m==="scan"?"":"none";document.getElementById("manualMode").style.display=m==="manual"?"":"none";document.getElementById("mt-scan").classList.toggle("on",m==="scan");document.getElementById("mt-manual").classList.toggle("on",m==="manual");document.getElementById("vcard").style.display="none";}
 function selU(el,name){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");usr=name;}
 function addU(){const v=document.getElementById("nuInput").value.trim();if(!v)return;const c=document.createElement("div");c.className="chip";c.textContent=v;c.onclick=function(){selU(this,v);};document.getElementById("chips").appendChild(c);document.getElementById("nuInput").value="";}
-function handleFile(e){if(e.target.files[0])loadImg(e.target.files[0]);}
+function handleFile(e){
+  const files=Array.from(e.target.files);
+  if(!files.length)return;
+  b64=[];mime=[];
+  const grid=document.getElementById('imgGrid');
+  grid.innerHTML='';
+  document.getElementById('imgPrev').style.display='';
+  document.getElementById('dz').style.display='none';
+  document.getElementById('vcard').style.display='none';
+  files.forEach((f,i)=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      b64[i]=ev.target.result.split(',')[1];
+      mime[i]=f.type||'image/jpeg';
+      const img=document.createElement('img');
+      img.src=ev.target.result;
+      img.style.cssText='height:90px;border-radius:8px;border:1px solid var(--border);object-fit:cover;';
+      grid.appendChild(img);
+    };
+    r.readAsDataURL(f);
+  });
+}
 function loadImg(f){mime=f.type||"image/jpeg";const r=new FileReader();r.onload=ev=>{b64=ev.target.result.split(",")[1];document.getElementById("pimg").src=ev.target.result;document.getElementById("imgPrev").style.display="";document.getElementById("dz").style.display="none";document.getElementById("vcard").style.display="none";};r.readAsDataURL(f);}
-function clearImg(){b64=null;document.getElementById("imgPrev").style.display="none";document.getElementById("dz").style.display="";document.getElementById("vcard").style.display="none";document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;}
-async function doScan(){if(!b64){toast("No image selected!","yellow");return;}if(!usr){toast("Select who is checking out!","yellow");return;}document.getElementById("scanSpin").style.display="";document.getElementById("scanbtn").disabled=true;document.getElementById("scanMsg").textContent="Sending to Claude AI...";try{const res=await post({action:"scan",imageB64:b64,mimeType:mime});if(!res.success)throw new Error(res.error);document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;popV(res,true);}catch(e){document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;toast("Scan failed: "+e.message,"red");}}
+function clearImg(){b64=null;mime=null;document.getElementById("imgGrid").innerHTML="";document.getElementById("imgPrev").style.display="none";document.getElementById("dz").style.display="";document.getElementById("vcard").style.display="none";document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;}
+async function doScan(){if(!b64||!b64.length){toast("No image selected!","yellow");return;}if(!usr){toast("Select who is checking out!","yellow");return;}document.getElementById("scanSpin").style.display="";document.getElementById("scanbtn").disabled=true;document.getElementById("scanMsg").textContent="Sending to Claude AI...";try{const res=await post({action:"scan",imageB64:Array.isArray(b64)?b64[0]:b64,mimeType:Array.isArray(mime)?mime[0]:mime,extraImages:Array.isArray(b64)?b64.slice(1).map((d,i)=>({data:d,mime:mime[i+1]})):[]});if(!res.success)throw new Error(res.error);document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;popV(res,true);}catch(e){document.getElementById("scanSpin").style.display="none";document.getElementById("scanbtn").disabled=false;toast("Scan failed: "+e.message,"red");}}
 function prepManual(){if(!usr){toast("Select who is checking out!","yellow");return;}const n=document.getElementById("m_name").value.trim();if(!n){toast("Equipment name required!","yellow");return;}popV({name:n,type:document.getElementById("m_type").value.trim(),serial:document.getElementById("m_serial").value.trim(),barcode:document.getElementById("m_barcode").value.trim(),notes:document.getElementById("m_notes").value.trim(),confidence:null},false);}
 function popV(d,fromAI){document.getElementById("v_name").value=d.name||"";document.getElementById("v_type").value=d.type||"";document.getElementById("v_serial").value=d.serial||"";document.getElementById("v_barcode").value=d.barcode||"";document.getElementById("v_notes").value=d.notes||"";document.getElementById("v_user").textContent=usr;document.getElementById("v_dt").textContent=new Date().toLocaleString();const cw=document.getElementById("confW");if(fromAI&&d.confidence!=null){cw.style.display="";document.getElementById("cfill").style.width=d.confidence+"%";document.getElementById("clbl").textContent=d.confidence+"% — "+(d.confidence>=80?"High confidence":d.confidence>=50?"Medium — double check":"Low — verify carefully");}else{cw.style.display="none";}ai=fromAI;const vc=document.getElementById("vcard");vc.style.display="";setTimeout(()=>vc.scrollIntoView({behavior:"smooth",block:"start"}),60);}
 function cancelV(){document.getElementById("vcard").style.display="none";}
