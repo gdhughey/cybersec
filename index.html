@@ -81,7 +81,7 @@ td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top
 </head>
 <body>
 <div class="navbar">
-  <div class="logo"><div class="ndot"></div>CYBERLAB TRACKER</div>
+  <button id="backBtn" onclick="swPage('checkout')" style="display:none;background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:.2rem .5rem .2rem 0;font-family:Sora,sans-serif;font-weight:700;">&#8592;</button><div class="logo"><div class="ndot"></div>CYBERLAB TRACKER</div>
   <a href="https://docs.google.com/spreadsheets/d/17o-6zimiFjAHPzi24PJblNJzrf5xXzVJhdFP4Av_YfQ/edit" target="_blank" style="font-family:JetBrains Mono,monospace;font-size:.62rem;color:var(--muted);text-decoration:none;">📊 Google Sheets</a>
 </div>
 <div class="scroll" id="scr">
@@ -184,7 +184,12 @@ td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top
 <script>
 const SURL = "https://ltu2yhwen0.execute-api.us-east-1.amazonaws.com/prod/tracker";
 let usr="", b64=null, mime="image/jpeg", ai=false, cache=[];
-function swPage(p){["checkout","checkin","log"].forEach(x=>{document.getElementById("pg-"+x).classList.toggle("on",x===p);document.getElementById("bt-"+x).classList.toggle("on",x===p);});document.getElementById("scr").scrollTop=0;if(p==="checkin")loadCI();if(p==="log")loadLog();}
+function swPage(p,fromPop){
+  // Show back button when not on checkout
+  var bb=document.getElementById('backBtn');
+  if(bb) bb.style.display=(p==='checkout'?'none':'inline-block');
+  // Push history state so Android back button works
+  if(!fromPop) history.pushState({page:p},'',location.href);["checkout","checkin","log"].forEach(x=>{document.getElementById("pg-"+x).classList.toggle("on",x===p);document.getElementById("bt-"+x).classList.toggle("on",x===p);});document.getElementById("scr").scrollTop=0;if(p==="checkin")loadCI();if(p==="log")loadLog();}
 function swMode(m){document.getElementById("scanMode").style.display=m==="scan"?"":"none";document.getElementById("manualMode").style.display=m==="manual"?"":"none";document.getElementById("mt-scan").classList.toggle("on",m==="scan");document.getElementById("mt-manual").classList.toggle("on",m==="manual");document.getElementById("vcard").style.display="none";}
 function selU(el,name){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");usr=name;}
 function addU(){const v=document.getElementById("nuInput").value.trim();if(!v)return;const c=document.createElement("div");c.className="chip";c.textContent=v;c.onclick=function(){selU(this,v);};document.getElementById("chips").appendChild(c);document.getElementById("nuInput").value="";}
@@ -316,6 +321,10 @@ function saveTok(a){sessionStorage.setItem('cl_acc',a.AccessToken||'');sessionSt
 function logout(){sessionStorage.removeItem('cl_tok');sessionStorage.removeItem('cl_exp');sessionStorage.removeItem('cl_acc');localStorage.removeItem('cl_rm');showOnly('lf');document.getElementById('lp').value='';document.getElementById('mc1').value='';document.getElementById('mc2').value='';showLogin();}
 // startup moved below (checkRm defined in next script block)
 var _it;function _rt(){clearTimeout(_it);_it=setTimeout(function(){logout();document.getElementById('le').textContent='Session expired after 15 minutes.';},15*60*1000);}
+window.addEventListener('popstate',function(e){
+  var p=(e.state&&e.state.page)||'checkout';
+  swPage(p,true);
+});
 ['mousemove','keydown','click','touchstart','scroll'].forEach(function(ev){document.addEventListener(ev,_rt,true);});_rt();
 </script><div id="adminOv" style="display:none;position:fixed;inset:0;background:#0a0f1a;z-index:8000;overflow-y:auto;">
 <div style="max-width:640px;margin:0 auto;padding:1.5rem;">
