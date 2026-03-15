@@ -200,29 +200,63 @@ async function post(d){const r=await fetch(SURL,{method:"POST",body:JSON.stringi
 async function get(a){const r=await fetch(SURL+"?action="+a);return r.json();}
 function toast(msg,type){const el=document.getElementById("toast");el.textContent=msg;el.style.borderColor=type==="red"?"var(--red)":type==="green"?"var(--green)":type==="yellow"?"var(--yellow)":"var(--border)";el.style.display="block";clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display="none",3200);}
 </script>
-<div id="lo" style="display:none;position:fixed;inset:0;background:#0a0f1a;z-index:9999;align-items:center;justify-content:center;"><div style="background:#111827;border:1px solid #1e3a5f;border-radius:12px;padding:2rem;width:320px;text-align:center;"><div style="color:#38bdf8;font-size:1.5rem;font-weight:700;margin-bottom:.5rem;">&#128274; CYBERLAB</div><div style="color:#64748b;font-size:.8rem;margin-bottom:1.5rem;">Authorized Personnel Only</div><div id="lf"><input id="lu" placeholder="Username" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;"><input id="lp" type="password" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;"><button onclick="doLogin()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;">Sign In</button><div id="le" style="color:#f87171;margin-top:.75rem;font-size:.85rem;min-height:1.2em;"></div></div><div id="cf" style="display:none;"><div style="color:#fbbf24;margin-bottom:1rem;font-size:.9rem;">First login — set your new password</div><input id="np1" type="password" placeholder="New password (min 8 chars)" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;"><input id="np2" type="password" placeholder="Confirm password" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;"><button onclick="doChg()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;">Set Password</button><div id="ce" style="color:#f87171;margin-top:.75rem;font-size:.85rem;min-height:1.2em;"></div></div></div></div><button onclick="logout()" style="position:fixed;top:.8rem;right:.8rem;z-index:1000;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:.35rem .8rem;cursor:pointer;font-size:.75rem;">Sign Out</button><script>
-var _cs=null,_cu=null;
+<div id="lo" style="display:none;position:fixed;inset:0;background:#0a0f1a;z-index:9999;align-items:center;justify-content:center;"><div style="background:#111827;border:1px solid #1e3a5f;border-radius:12px;padding:2rem;width:340px;text-align:center;max-height:92vh;overflow-y:auto;">
+<div style="color:#38bdf8;font-size:1.5rem;font-weight:700;margin-bottom:.25rem;">&#128274; CYBERLAB</div>
+<div style="color:#64748b;font-size:.8rem;margin-bottom:1.5rem;">Authorized Personnel Only</div>
+<div id="lf">
+<input id="lu" placeholder="Username" autocomplete="username" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<input id="lp" type="password" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<button onclick="doLogin()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Sign In</button>
+<div id="le" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
+</div>
+<div id="cf" style="display:none;">
+<div style="color:#fbbf24;margin-bottom:1rem;font-size:.9rem;">First login — set your new password</div>
+<input id="np1" type="password" placeholder="New password (min 8 chars)" autocomplete="new-password" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<input id="np2" type="password" placeholder="Confirm password" autocomplete="new-password" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<button onclick="doChg()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Set Password</button>
+<div id="ce" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
+</div>
+<div id="mf" style="display:none;">
+<div style="color:#34d399;font-weight:700;margin-bottom:.4rem;">Set Up Google Authenticator</div>
+<div style="color:#94a3b8;font-size:.8rem;margin-bottom:.8rem;">Open Google Authenticator and scan this QR code</div>
+<img id="qr" src="" style="width:180px;height:180px;margin:.5rem auto;display:block;border-radius:8px;background:#fff;">
+<div style="font-size:.7rem;color:#64748b;margin:.6rem 0 .8rem;">Or enter key manually:<br><span id="sk" style="font-family:monospace;color:#38bdf8;word-break:break-all;font-size:.72rem;user-select:all;"></span></div>
+<input id="mc1" placeholder="Enter 6-digit code from app" type="tel" maxlength="6" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doMfaSetup()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<button onclick="doMfaSetup()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Verify &amp; Enable</button>
+<div id="me1" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
+</div>
+<div id="vf" style="display:none;">
+<div style="font-size:2rem;margin-bottom:.4rem;">&#128241;</div>
+<div style="color:#38bdf8;font-weight:700;margin-bottom:.4rem;">Two-Factor Authentication</div>
+<div style="color:#94a3b8;font-size:.8rem;margin-bottom:.8rem;">Enter the 6-digit code from Google Authenticator</div>
+<input id="mc2" placeholder="000000" type="tel" maxlength="6" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doMfaVerify()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
+<button onclick="doMfaVerify()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Verify</button>
+<div id="me2" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
+</div>
+</div></div>
+<button onclick="logout()" style="position:fixed;top:.8rem;right:.8rem;z-index:1000;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:.35rem .8rem;cursor:pointer;font-size:.75rem;">Sign Out</button>
+<script>
+var _cs=null,_cu=null,_ms=null;
+var CID='3o6qc76sh2m9272pobd99k9al2';
 var _of=window.fetch;
 window.fetch=function(u,o){
   o=o||{};
   var t=sessionStorage.getItem('cl_tok');
-  if(t&&typeof u==='string'&&u.indexOf('execute-api')>-1){
-    o.headers=o.headers||{};
-    o.headers['Authorization']='Bearer '+t;
-  }
+  if(t&&typeof u==='string'&&u.indexOf('execute-api')>-1){o.headers=o.headers||{};o.headers['Authorization']='Bearer '+t;}
   return _of(u,o);
 };
-function cog(tgt,body){
-  return _of('https://cognito-idp.us-east-1.amazonaws.com/',{method:'POST',headers:{'Content-Type':'application/x-amz-json-1.1','X-Amz-Target':'AWSCognitoIdentityProviderService.'+tgt},body:JSON.stringify(body)}).then(function(r){return r.json();});
-}
-function showLogin(){var lo=document.getElementById('lo');lo.style.display='flex';}
+function cog(tgt,body){return _of('https://cognito-idp.us-east-1.amazonaws.com/',{method:'POST',headers:{'Content-Type':'application/x-amz-json-1.1','X-Amz-Target':'AWSCognitoIdentityProviderService.'+tgt},body:JSON.stringify(body)}).then(function(r){return r.json();});}
+function showOnly(id){['lf','cf','mf','vf'].forEach(function(x){document.getElementById(x).style.display=x===id?'block':'none';});}
+function showLogin(){document.getElementById('lo').style.display='flex';}
 function hideLogin(){document.getElementById('lo').style.display='none';}
 async function doLogin(){
   var u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
-  document.getElementById('le').textContent='Signing in...';
+  document.getElementById('le').textContent='Signing in...';_cu=u;
   try{
-    var r=await cog('InitiateAuth',{AuthFlow:'USER_PASSWORD_AUTH',ClientId:'3o6qc76sh2m9272pobd99k9al2',AuthParameters:{USERNAME:u,PASSWORD:p}});
-    if(r.ChallengeName==='NEW_PASSWORD_REQUIRED'){_cs=r.Session;_cu=u;document.getElementById('lf').style.display='none';document.getElementById('cf').style.display='block';document.getElementById('le').textContent='';}
+    var r=await cog('InitiateAuth',{AuthFlow:'USER_PASSWORD_AUTH',ClientId:CID,AuthParameters:{USERNAME:u,PASSWORD:p}});
+    if(r.ChallengeName==='NEW_PASSWORD_REQUIRED'){_cs=r.Session;showOnly('cf');document.getElementById('le').textContent='';}
+    else if(r.ChallengeName==='MFA_SETUP'){_cs=r.Session;await startMfaSetup();}
+    else if(r.ChallengeName==='SOFTWARE_TOKEN_MFA'){_cs=r.Session;showOnly('vf');document.getElementById('le').textContent='';setTimeout(function(){document.getElementById('mc2').focus();},100);}
     else if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
     else{document.getElementById('le').textContent=r.message||'Login failed';}
   }catch(e){document.getElementById('le').textContent='Error: '+e.message;}
@@ -232,39 +266,52 @@ async function doChg(){
   if(np!==np2){document.getElementById('ce').textContent='Passwords do not match';return;}
   if(np.length<8){document.getElementById('ce').textContent='Minimum 8 characters';return;}
   try{
-    var r=await cog('RespondToAuthChallenge',{ClientId:'3o6qc76sh2m9272pobd99k9al2',ChallengeName:'NEW_PASSWORD_REQUIRED',Session:_cs,ChallengeResponses:{USERNAME:_cu,NEW_PASSWORD:np}});
-    if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
+    var r=await cog('RespondToAuthChallenge',{ClientId:CID,ChallengeName:'NEW_PASSWORD_REQUIRED',Session:_cs,ChallengeResponses:{USERNAME:_cu,NEW_PASSWORD:np}});
+    if(r.ChallengeName==='MFA_SETUP'){_cs=r.Session;await startMfaSetup();}
+    else if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
     else{document.getElementById('ce').textContent=r.message||'Failed';}
   }catch(e){document.getElementById('ce').textContent='Error: '+e.message;}
 }
-function saveTok(a){
-  sessionStorage.setItem('cl_tok',a.IdToken);
-  sessionStorage.setItem('cl_exp',Date.now()+(a.ExpiresIn*1000));
-  hideLogin();
+async function startMfaSetup(){
+  document.getElementById('me1').textContent='Loading QR code...';
+  try{
+    var r=await cog('AssociateSoftwareToken',{Session:_cs});
+    _ms=r.Session;
+    var secret=r.SecretCode;
+    var qrData='otpauth://totp/CyberLab:'+_cu+'?secret='+secret+'&issuer=CyberLab';
+    document.getElementById('qr').src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(qrData);
+    document.getElementById('sk').textContent=secret;
+    document.getElementById('me1').textContent='';
+    showOnly('mf');
+  }catch(e){document.getElementById('me1').textContent='Error: '+e.message;}
 }
-function logout(){
-  sessionStorage.removeItem('cl_tok');sessionStorage.removeItem('cl_exp');
-  document.getElementById('lf').style.display='block';
-  document.getElementById('cf').style.display='none';
-  document.getElementById('lp').value='';
-  showLogin();
+async function doMfaSetup(){
+  var code=document.getElementById('mc1').value.trim().replace(/s/g,'');
+  if(code.length!==6){document.getElementById('me1').textContent='Enter a 6-digit code';return;}
+  document.getElementById('me1').textContent='Verifying...';
+  try{
+    var vr=await cog('VerifySoftwareToken',{Session:_ms,UserCode:code,FriendlyDeviceName:'Google Authenticator'});
+    if(vr.Status==='SUCCESS'||vr.Session){
+      var r2=await cog('RespondToAuthChallenge',{ClientId:CID,ChallengeName:'MFA_SETUP',Session:vr.Session||_ms,ChallengeResponses:{USERNAME:_cu}});
+      if(r2.AuthenticationResult){saveTok(r2.AuthenticationResult);}
+      else{document.getElementById('me1').textContent=r2.message||'Setup failed, try again';}
+    }else{document.getElementById('me1').textContent=vr.message||'Invalid code, try again';}
+  }catch(e){document.getElementById('me1').textContent='Error: '+e.message;}
 }
-(function(){
-  var t=sessionStorage.getItem('cl_tok'),e=sessionStorage.getItem('cl_exp');
-  if(!t||!e||Date.now()>parseInt(e)){showLogin();}
-})();
-</script><script>
-var _t;
-function _rt(){
-  clearTimeout(_t);
-  _t=setTimeout(function(){
-    logout();
-    document.getElementById('le').textContent='Session expired after 15 minutes.';
-  },15*60*1000);
+async function doMfaVerify(){
+  var code=document.getElementById('mc2').value.toString().trim();
+  if(code.length!==6){document.getElementById('me2').textContent='Enter 6-digit code';return;}
+  document.getElementById('me2').textContent='Verifying...';
+  try{
+    var r=await cog('RespondToAuthChallenge',{ClientId:CID,ChallengeName:'SOFTWARE_TOKEN_MFA',Session:_cs,ChallengeResponses:{USERNAME:_cu,SOFTWARE_TOKEN_MFA_CODE:code}});
+    if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
+    else{document.getElementById('me2').textContent=r.message||'Invalid code';}
+  }catch(e){document.getElementById('me2').textContent='Error: '+e.message;}
 }
-['mousemove','keydown','click','touchstart','scroll'].forEach(function(e){
-  document.addEventListener(e,_rt,true);
-});
-_rt();
+function saveTok(a){sessionStorage.setItem('cl_tok',a.IdToken);sessionStorage.setItem('cl_exp',Date.now()+(a.ExpiresIn*1000));hideLogin();}
+function logout(){sessionStorage.removeItem('cl_tok');sessionStorage.removeItem('cl_exp');showOnly('lf');document.getElementById('lp').value='';document.getElementById('mc1').value='';document.getElementById('mc2').value='';showLogin();}
+(function(){var t=sessionStorage.getItem('cl_tok'),e=sessionStorage.getItem('cl_exp');if(!t||!e||Date.now()>parseInt(e)){showLogin();}})();
+var _it;function _rt(){clearTimeout(_it);_it=setTimeout(function(){logout();document.getElementById('le').textContent='Session expired after 15 minutes.';},15*60*1000);}
+['mousemove','keydown','click','touchstart','scroll'].forEach(function(ev){document.addEventListener(ev,_rt,true);});_rt();
 </script></body>
 </html>
