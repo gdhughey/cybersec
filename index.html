@@ -221,7 +221,7 @@ async function doLogin(){
   var u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
   document.getElementById('le').textContent='Signing in...';
   try{
-    var r=await cog('InitiateAuth',{AuthFlow:'USER_PASSWORD_AUTH',ClientId:'57b693foi74is1v035ivvalk0o',AuthParameters:{USERNAME:u,PASSWORD:p}});
+    var r=await cog('InitiateAuth',{AuthFlow:'USER_PASSWORD_AUTH',ClientId:'3o6qc76sh2m9272pobd99k9al2',AuthParameters:{USERNAME:u,PASSWORD:p}});
     if(r.ChallengeName==='NEW_PASSWORD_REQUIRED'){_cs=r.Session;_cu=u;document.getElementById('lf').style.display='none';document.getElementById('cf').style.display='block';document.getElementById('le').textContent='';}
     else if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
     else{document.getElementById('le').textContent=r.message||'Login failed';}
@@ -232,7 +232,7 @@ async function doChg(){
   if(np!==np2){document.getElementById('ce').textContent='Passwords do not match';return;}
   if(np.length<8){document.getElementById('ce').textContent='Minimum 8 characters';return;}
   try{
-    var r=await cog('RespondToAuthChallenge',{ClientId:'57b693foi74is1v035ivvalk0o',ChallengeName:'NEW_PASSWORD_REQUIRED',Session:_cs,ChallengeResponses:{USERNAME:_cu,NEW_PASSWORD:np}});
+    var r=await cog('RespondToAuthChallenge',{ClientId:'3o6qc76sh2m9272pobd99k9al2',ChallengeName:'NEW_PASSWORD_REQUIRED',Session:_cs,ChallengeResponses:{USERNAME:_cu,NEW_PASSWORD:np}});
     if(r.AuthenticationResult){saveTok(r.AuthenticationResult);}
     else{document.getElementById('ce').textContent=r.message||'Failed';}
   }catch(e){document.getElementById('ce').textContent='Error: '+e.message;}
