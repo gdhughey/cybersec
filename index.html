@@ -81,7 +81,7 @@ td{padding:8px 8px;border-bottom:1px solid rgba(26,45,74,.45);vertical-align:top
 </head>
 <body>
 <div class="navbar">
-  <button id="backBtn" onclick="swPage('checkout')" style="display:none;background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:.2rem .5rem .2rem 0;font-family:Sora,sans-serif;font-weight:700;">&#8592;</button><div class="logo"><div class="ndot"></div>CYBERLAB TRACKER</div>
+  <button id="backBtn" onclick="swPage('checkout')" style="display:none;background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:.2rem .5rem .2rem 0;font-family:Sora,sans-serif;font-weight:700;">&#8592;</button><button id="backBtn" onclick="swPage('checkout')" style="display:none;background:none;border:none;color:#00cfff;font-size:1.4rem;cursor:pointer;padding:0 .5rem 0 0;line-height:1;">&#8592;</button><div class="logo"><div class="ndot"></div>CYBERLAB TRACKER</div>
   <a href="https://docs.google.com/spreadsheets/d/17o-6zimiFjAHPzi24PJblNJzrf5xXzVJhdFP4Av_YfQ/edit" target="_blank" style="font-family:JetBrains Mono,monospace;font-size:.62rem;color:var(--muted);text-decoration:none;">📊 Google Sheets</a>
 </div>
 <div class="scroll" id="scr">
@@ -325,6 +325,7 @@ window.addEventListener('popstate',function(e){
   var p=(e.state&&e.state.page)||'checkout';
   swPage(p,true);
 });
+window.addEventListener('popstate',function(e){swPage((e.state&&e.state.page)||'checkout',true);});
 ['mousemove','keydown','click','touchstart','scroll'].forEach(function(ev){document.addEventListener(ev,_rt,true);});_rt();
 </script><div id="adminOv" style="display:none;position:fixed;inset:0;background:#0a0f1a;z-index:8000;overflow-y:auto;">
 <div style="max-width:640px;margin:0 auto;padding:1.5rem;">
