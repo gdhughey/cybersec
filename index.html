@@ -193,6 +193,19 @@ function swPage(p,fromPop){
 function swMode(m){document.getElementById("scanMode").style.display=m==="scan"?"":"none";document.getElementById("manualMode").style.display=m==="manual"?"":"none";document.getElementById("mt-scan").classList.toggle("on",m==="scan");document.getElementById("mt-manual").classList.toggle("on",m==="manual");document.getElementById("vcard").style.display="none";}
 function selU(el,name){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");usr=name;}
 function addU(){const v=document.getElementById("nuInput").value.trim();if(!v)return;const c=document.createElement("div");c.className="chip";c.textContent=v;c.onclick=function(){selU(this,v);};document.getElementById("chips").appendChild(c);document.getElementById("nuInput").value="";}
+function compressImage(dataUrl,cb){
+  const img=new Image();
+  img.onload=function(){
+    const MAX=1200;
+    let w=img.width,h=img.height;
+    if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+    const c=document.createElement('canvas');
+    c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',0.75));
+  };
+  img.src=dataUrl;
+}
 function handleFile(e){
   const files=Array.from(e.target.files);
   if(!files.length)return;
@@ -205,12 +218,14 @@ function handleFile(e){
   files.forEach((f,i)=>{
     const r=new FileReader();
     r.onload=ev=>{
-      b64[i]=ev.target.result.split(',')[1];
-      mime[i]=f.type||'image/jpeg';
-      const img=document.createElement('img');
-      img.src=ev.target.result;
-      img.style.cssText='height:90px;border-radius:8px;border:1px solid var(--border);object-fit:cover;';
-      grid.appendChild(img);
+      compressImage(ev.target.result,function(compressed){
+        b64[i]=compressed.split(',')[1];
+        mime[i]='image/jpeg';
+        const img=document.createElement('img');
+        img.src=compressed;
+        img.style.cssText='height:90px;border-radius:8px;border:1px solid var(--border);object-fit:cover;';
+        grid.appendChild(img);
+      });
     };
     r.readAsDataURL(f);
   });
