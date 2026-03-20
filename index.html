@@ -262,6 +262,7 @@ function toast(msg,type){const el=document.getElementById("toast");el.textConten
 <input id="mc2" placeholder="000000" type="tel" maxlength="6" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doMfaVerify()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
 <button onclick="doMfaVerify()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Verify</button>
 <div id="me2" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
+</div>
 <div id="ff" style="display:none;">
 <div style="font-size:2rem;margin-bottom:.4rem;">&#128274;</div>
 <div style="color:#38bdf8;font-weight:700;margin-bottom:.4rem;">Forgot Password</div>
@@ -282,7 +283,6 @@ function toast(msg,type){const el=document.getElementById("toast");el.textConten
 <button onclick="doReset()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;">Reset Password</button>
 <div id="rf_err" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
 <div style="margin-top:.5rem;"><span onclick="showOnly('lf')" style="color:#64748b;font-size:.8rem;cursor:pointer;text-decoration:underline;">Back to login</span></div>
-</div>
 </div>
 </div></div>
 <div id="gearWrap" style="position:fixed;top:.6rem;right:7.5rem;z-index:1000;"><button onclick="toggleGear()" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:.3rem .55rem;cursor:pointer;font-size:1.1rem;line-height:1;">⚙️</button><div id="gearDrop" style="display:none;position:absolute;right:0;top:2.3rem;background:#1e293b;border:1px solid #334155;border-radius:8px;min-width:175px;box-shadow:0 4px 16px rgba(0,0,0,.5);overflow:hidden;"><div id="adminMI" onclick="showAdmin()" style="display:none;padding:.65rem 1rem;color:#38bdf8;cursor:pointer;font-size:.85rem;border-bottom:1px solid #334155;white-space:nowrap;">👥 Admin Panel</div><div onclick="showChp()" style="padding:.65rem 1rem;color:#e2e8f0;cursor:pointer;font-size:.85rem;border-bottom:1px solid #334155;white-space:nowrap;">🔑 Change Password</div><div onclick="logout()" style="padding:.65rem 1rem;color:#f87171;cursor:pointer;font-size:.85rem;white-space:nowrap;">🚪 Sign Out</div></div></div>
