@@ -277,7 +277,7 @@ window.fetch=function(u,o){
 };
 function cog(tgt,body){return _of('https://cognito-idp.us-east-1.amazonaws.com/',{method:'POST',headers:{'Content-Type':'application/x-amz-json-1.1','X-Amz-Target':'AWSCognitoIdentityProviderService.'+tgt},body:JSON.stringify(body)}).then(function(r){return r.json();});}
 function showOnly(id){['lf','cf','mf','vf','ff','rf'].forEach(function(x){document.getElementById(x).style.display=x===id?'block':'none';});}
-function showLogin(){document.getElementById('lo').style.display='flex';}
+function showLogin(){document.getElementById('lo').style.display='flex';showOnly('lf');}
 function hideLogin(){document.getElementById('lo').style.display='none';}
 async function doLogin(){
   var u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
