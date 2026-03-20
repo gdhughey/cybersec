@@ -237,7 +237,7 @@ function toast(msg,type){const el=document.getElementById("toast");el.textConten
 <input id="lu" placeholder="Username" autocomplete="username" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
 <input id="lp" type="password" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding:.6rem;margin-bottom:.8rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
 <label style="display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.82rem;cursor:pointer;margin-bottom:.75rem;justify-content:center;"><input type="checkbox" id="rememberMe" style="width:14px;height:14px;cursor:pointer;"> &#128274; Remember me (encrypted)</label><button onclick="doLogin()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Sign In</button>
-<div id="le" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div><div style="margin-top:.5rem;"><span onclick="showOnly('ff')" style="color:#64748b;font-size:.8rem;cursor:pointer;text-decoration:underline;">Forgot password?</span></div>
+<div id="le" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
 </div>
 <div id="cf" style="display:none;">
 <div style="color:#fbbf24;margin-bottom:1rem;font-size:.9rem;">First login — set your new password</div>
@@ -263,8 +263,6 @@ function toast(msg,type){const el=document.getElementById("toast");el.textConten
 <button onclick="doMfaVerify()" style="width:100%;padding:.75rem;background:#0369a1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:1rem;margin-top:.2rem;">Verify</button>
 <div id="me2" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
 </div>
-<div id="ff" style="display:none;">
-<div style="font-size:2rem;margin-bottom:.4rem;">&#128274;</div>
 <div style="color:#38bdf8;font-weight:700;margin-bottom:.4rem;">Forgot Password</div>
 <div style="color:#94a3b8;font-size:.8rem;margin-bottom:.8rem;">Enter your username and the email to send the reset code to</div>
 <input id="fw_u" placeholder="Username" type="text" autocomplete="username" style="width:100%;padding:.6rem;margin-bottom:.6rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
@@ -273,8 +271,6 @@ function toast(msg,type){const el=document.getElementById("toast");el.textConten
 <div id="fw_err" style="color:#f87171;margin-top:.6rem;font-size:.85rem;min-height:1.2em;"></div>
 <div style="margin-top:.5rem;"><span onclick="showOnly('lf')" style="color:#64748b;font-size:.8rem;cursor:pointer;text-decoration:underline;">Back to login</span></div>
 </div>
-<div id="rf" style="display:none;">
-<div style="font-size:2rem;margin-bottom:.4rem;">&#128274;</div>
 <div style="color:#38bdf8;font-weight:700;margin-bottom:.4rem;">Reset Password</div>
 <div style="color:#94a3b8;font-size:.8rem;margin-bottom:.8rem;">Enter the code from your email and a new password</div>
 <input id="rf_c" placeholder="Reset code" type="text" maxlength="6" style="width:100%;padding:.6rem;margin-bottom:.6rem;background:#1e293b;border:1px solid #1e3a5f;border-radius:6px;color:#e2e8f0;box-sizing:border-box;font-size:1rem;">
@@ -297,7 +293,7 @@ window.fetch=function(u,o){
   return _of(u,o);
 };
 function cog(tgt,body){return _of('https://cognito-idp.us-east-1.amazonaws.com/',{method:'POST',headers:{'Content-Type':'application/x-amz-json-1.1','X-Amz-Target':'AWSCognitoIdentityProviderService.'+tgt},body:JSON.stringify(body)}).then(function(r){return r.json();});}
-function showOnly(id){['lf','cf','mf','vf','ff','rf'].forEach(function(x){document.getElementById(x).style.display=x===id?'block':'none';});}
+function showOnly(id){['lf','cf','mf','vf'].forEach(function(x){document.getElementById(x).style.display=x===id?'block':'none';});}
 function showLogin(){document.getElementById('lo').style.display='flex';showOnly('lf');}
 function hideLogin(){document.getElementById('lo').style.display='none';}
 async function doLogin(){
